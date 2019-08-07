@@ -1,6 +1,7 @@
 package assetmanagement
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -43,6 +44,9 @@ func (k Keeper) GetToken(ctx sdk.Context, symbol string) (error, *types.Token) {
 
 // SetToken sets the entire Token metadata struct by symbol. Owner must be set. Returns success
 func (k Keeper) SetToken(ctx sdk.Context, symbol string, token *types.Token) error {
+	if token == nil {
+		return errors.New("unable to store nil/empty token")
+	}
 	if token.Owner.Empty() {
 		return fmt.Errorf("unable to store token because owner for symbol '%s' is empty", symbol)
 	}
