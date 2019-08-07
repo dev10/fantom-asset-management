@@ -83,25 +83,25 @@ func (k Keeper) SetOwner(ctx sdk.Context, symbol string, owner sdk.AccAddress) {
 	k.SetToken(ctx, symbol, token)
 }
 
-// GetPrice - gets the current total supply of a symbol
+// GetTotalSupply - gets the current total supply of a symbol
 func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) sdk.Coins {
 	return k.GetToken(ctx, symbol).TotalSupply
 }
 
-// SetPrice - sets the current total supply of a symbol
-func (k Keeper) SetPrice(ctx sdk.Context, symbol string, price sdk.Coins) {
+// SetTotalSupply - sets the current total supply of a symbol
+func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, price sdk.Coins) {
 	token := k.GetToken(ctx, symbol)
 	token.TotalSupply = price
 	k.SetToken(ctx, symbol, token)
 }
 
-// Get an iterator over all symbols in which the keys are the symbols and the values are the token
+// GetNamesIterator - Get an iterator over all symbols in which the keys are the symbols and the values are the token
 func (k Keeper) GetNamesIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, nil)
 }
 
-// Check if the symbol is present in the store or not
+// IsSymbolPresent - Check if the symbol is present in the store or not
 func (k Keeper) IsSymbolPresent(ctx sdk.Context, symbol string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has([]byte(symbol))

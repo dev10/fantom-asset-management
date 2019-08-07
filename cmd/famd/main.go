@@ -52,7 +52,7 @@ func main() {
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "NS", app.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "FAM", app.DefaultNodeHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
@@ -68,15 +68,15 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		nsApp := app.NewFantomAssetManagementApp(logger, db)
-		err := nsApp.LoadHeight(height)
+		famApp := app.NewFantomAssetManagementApp(logger, db)
+		err := famApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
 		}
-		return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+		return famApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	nsApp := app.NewFantomAssetManagementApp(logger, db)
+	famApp := app.NewFantomAssetManagementApp(logger, db)
 
-	return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return famApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }
