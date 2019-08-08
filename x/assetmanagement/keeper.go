@@ -31,15 +31,15 @@ func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) 
 }
 
 // GetToken gets the entire Token metadata struct by symbol. False if not found, true otherwise
-func (k Keeper) GetToken(ctx sdk.Context, symbol string) (error, *types.Token) {
+func (k Keeper) GetToken(ctx sdk.Context, symbol string) (*types.Token, error) {
 	store := ctx.KVStore(k.storeKey)
 	if !k.IsSymbolPresent(ctx, symbol) {
-		return fmt.Errorf("could not find Token for symbol '%s'", symbol), nil
+		return nil, fmt.Errorf("could not find Token for symbol '%s'", symbol)
 	}
 	bz := store.Get([]byte(symbol))
 	var token types.Token
 	k.cdc.MustUnmarshalBinaryBare(bz, &token)
-	return nil, &token
+	return &token, nil
 }
 
 // SetToken sets the entire Token metadata struct by symbol. Owner must be set. Returns success
@@ -55,77 +55,76 @@ func (k Keeper) SetToken(ctx sdk.Context, symbol string, token *types.Token) err
 	return nil
 }
 
-// Deletes the entire Token metadata struct by symbol
+// DeleteToken - deletes the entire Token metadata struct by symbol
 func (k Keeper) DeleteToken(ctx sdk.Context, symbol string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete([]byte(symbol))
 }
 
 // ResolveName - returns the name string that the symbol resolves to
-func (k Keeper) ResolveName(ctx sdk.Context, symbol string) (error, string) {
-	if err, found := k.GetToken(ctx, symbol); err == nil {
-		return nil, found.Name
-	} else {
-		return fmt.Errorf("couldn't resolve name for symbol '%s' because: %s", symbol, err), ""
+func (k Keeper) ResolveName(ctx sdk.Context, symbol string) (string, error) {
+	found, err := k.GetToken(ctx, symbol)
+	if err == nil {
+		return found.Name, nil
 	}
+	return "", fmt.Errorf("couldn't resolve name for symbol '%s' because: %s", symbol, err)
 }
 
 // SetName - sets the name string that a symbol resolves to
 func (k Keeper) SetName(ctx sdk.Context, symbol string, name string) error {
-	err, token := k.GetToken(ctx, symbol)
+	token, err := k.GetToken(ctx, symbol)
 	if err == nil {
 		token.Name = name
 		return k.SetToken(ctx, symbol, token)
-	} else {
-		return fmt.Errorf("failed to set token name for symbol '%s' because: %s", symbol, err)
 	}
+	return fmt.Errorf("failed to set token name for symbol '%s' because: %s", symbol, err)
 }
 
 // HasOwner - returns whether or not the symbol already has an owner
-func (k Keeper) HasOwner(ctx sdk.Context, symbol string) (error, bool) {
-	if err, token := k.GetToken(ctx, symbol); err == nil {
-		return nil, !token.Owner.Empty()
-	} else {
-		return fmt.Errorf("unable to check owner for symbol '%s' because: %s", symbol, err), false
+func (k Keeper) HasOwner(ctx sdk.Context, symbol string) (bool, error) {
+	token, err := k.GetToken(ctx, symbol)
+	if err == nil {
+		return !token.Owner.Empty(), nil
 	}
+	return false, fmt.Errorf("unable to check owner for symbol '%s' because: %s", symbol, err)
 }
 
 // GetOwner - get the current owner of a symbol
-func (k Keeper) GetOwner(ctx sdk.Context, symbol string) (error, sdk.AccAddress) {
-	if err, token := k.GetToken(ctx, symbol); err == nil {
-		return nil, token.Owner
-	} else {
-		return fmt.Errorf("unable to get owner for symbol '%s' because: %s", symbol, err), nil
+func (k Keeper) GetOwner(ctx sdk.Context, symbol string) (sdk.AccAddress, error) {
+	token, err := k.GetToken(ctx, symbol)
+	if err == nil {
+		return token.Owner, nil
 	}
+	return nil, fmt.Errorf("unable to get owner for symbol '%s' because: %s", symbol, err)
 }
 
 // SetOwner - sets the current owner of a symbol
 func (k Keeper) SetOwner(ctx sdk.Context, symbol string, owner sdk.AccAddress) error {
-	if err, token := k.GetToken(ctx, symbol); err == nil {
+	token, err := k.GetToken(ctx, symbol)
+	if err == nil {
 		token.Owner = owner
 		return k.SetToken(ctx, symbol, token)
-	} else {
-		return fmt.Errorf("unable to set owner for symbol '%s' because: %s", symbol, err)
 	}
+	return fmt.Errorf("unable to set owner for symbol '%s' because: %s", symbol, err)
 }
 
 // GetTotalSupply - gets the current total supply of a symbol
-func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) (error, sdk.Coins) {
-	if err, token := k.GetToken(ctx, symbol); err == nil {
-		return nil, token.TotalSupply
-	} else {
-		return fmt.Errorf("failed to get total supply for symbol '%s' because: %s", symbol, err), nil
+func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) (sdk.Coins, error) {
+	token, err := k.GetToken(ctx, symbol)
+	if err == nil {
+		return token.TotalSupply, nil
 	}
+	return nil, fmt.Errorf("failed to get total supply for symbol '%s' because: %s", symbol, err)
 }
 
 // SetTotalSupply - sets the current total supply of a symbol
 func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, price sdk.Coins) error {
-	if err, token := k.GetToken(ctx, symbol); err == nil {
+	token, err := k.GetToken(ctx, symbol)
+	if err == nil {
 		token.TotalSupply = price
 		return k.SetToken(ctx, symbol, token)
-	} else {
-		return fmt.Errorf("failed to set total supply for symbol '%s' because: %s", symbol, err)
 	}
+	return fmt.Errorf("failed to set total supply for symbol '%s' because: %s", symbol, err)
 }
 
 // GetNamesIterator - Get an iterator over all symbols in which the keys are the symbols and the values are the token
