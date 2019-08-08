@@ -24,7 +24,7 @@ An issuance transaction contains:
 
     For example, "NNF-F90". Only FTM does not have this suffix.
 * **Total Supply**: an int64 boosted by 1e8 for decimal part. The max total supply is 90 billion.
-* **Mintable**: that means whether this token can be minted in the future. To set the tokes to be mintable, you need to add --mintable, otherwise just omit this field to set this token to be non-mintable.
+* **Mintable**: that means whether this token can be minted in the future. To set the tokens to be mintable, you need to add --mintable, otherwise just omit this field to set this token to be non-mintable.
 
 ### Example on **mainnet:**
 ```bash
