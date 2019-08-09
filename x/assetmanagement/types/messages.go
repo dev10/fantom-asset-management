@@ -146,3 +146,95 @@ func (msg MsgBurnCoins) GetSignBytes() []byte {
 func (msg MsgBurnCoins) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Source}
 }
+
+// MsgFreezeCoins defines the FreezeCoins message
+type MsgFreezeCoins struct {
+	Amount string         `json:"amount"`
+	Symbol string         `json:"symbol"`
+	Source sdk.AccAddress `json:"source"`
+}
+
+// NewMsgFreezeCoins is the constructor function for MsgFreezeCoins
+func NewMsgFreezeCoins(amount, symbol string, source sdk.AccAddress) MsgFreezeCoins {
+	return MsgFreezeCoins{
+		Amount: amount,
+		Symbol: symbol,
+		Source: source,
+	}
+}
+
+// Route should return the name of the module
+func (msg MsgFreezeCoins) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg MsgFreezeCoins) Type() string { return "freeze_coins" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgFreezeCoins) ValidateBasic() sdk.Error {
+	if msg.Source.Empty() {
+		return sdk.ErrInvalidAddress(msg.Source.String())
+	}
+	if len(msg.Symbol) == 0 || len(msg.Amount) == 0 {
+		return sdk.ErrUnknownRequest("Symbol and/or Amount cannot be empty")
+	}
+	if strings.Contains(msg.Amount, "-") {
+		return sdk.ErrUnknownRequest("Amount cannot be negative")
+	}
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg MsgFreezeCoins) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+// GetSigners defines whose signature is required
+func (msg MsgFreezeCoins) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Source}
+}
+
+// MsgUnfreezeCoins defines the UnfreezeCoins message
+type MsgUnfreezeCoins struct {
+	Amount string         `json:"amount"`
+	Symbol string         `json:"symbol"`
+	Source sdk.AccAddress `json:"source"`
+}
+
+// NewMsgUnfreezeCoins is the constructor function for MsgUnfreezeCoins
+func NewMsgUnfreezeCoins(amount, symbol string, source sdk.AccAddress) MsgUnfreezeCoins {
+	return MsgUnfreezeCoins{
+		Amount: amount,
+		Symbol: symbol,
+		Source: source,
+	}
+}
+
+// Route should return the name of the module
+func (msg MsgUnfreezeCoins) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg MsgUnfreezeCoins) Type() string { return "unfreeze_coins" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgUnfreezeCoins) ValidateBasic() sdk.Error {
+	if msg.Source.Empty() {
+		return sdk.ErrInvalidAddress(msg.Source.String())
+	}
+	if len(msg.Symbol) == 0 || len(msg.Amount) == 0 {
+		return sdk.ErrUnknownRequest("Symbol and/or Amount cannot be empty")
+	}
+	if strings.Contains(msg.Amount, "-") {
+		return sdk.ErrUnknownRequest("Amount cannot be negative")
+	}
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg MsgUnfreezeCoins) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+// GetSigners defines whose signature is required
+func (msg MsgUnfreezeCoins) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Source}
+}
