@@ -57,7 +57,6 @@ func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg types.MsgMintCoins) 
 		return sdk.ErrUnauthorized("Incorrect Owner").Result() // If not, throw an error
 	}
 
-	// Fix: can't add Dec amount of coins because Cosmos sdk doesn't have AddDecCoins function
 	coins, err := keeper.coinKeeper.AddCoins(ctx, owner,
 		sdk.NewCoins(sdk.NewInt64Coin(msg.Symbol, msg.Amount)))
 	if err != nil {
@@ -67,6 +66,30 @@ func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg types.MsgMintCoins) 
 	err = keeper.SetTotalSupply(ctx, msg.Symbol, coins)
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to set total supply when minting coins: '%s'", err)).Result()
+	}
+	return sdk.Result{}
+}
+
+// handle message to burn coins
+func handleMsgBurnCoins(ctx sdk.Context, keeper Keeper, msg types.MsgBurnCoins) sdk.Result {
+	owner, err := keeper.GetOwner(ctx, msg.Symbol)
+	if err != nil {
+		return sdk.ErrUnknownAddress(
+			fmt.Sprintf("Could not find the owner for the symbol '%s'", msg.Symbol)).Result()
+	}
+	if !msg.Owner.Equals(owner) { // Checks if the msg sender is the same as the current owner
+		return sdk.ErrUnauthorized("Incorrect Owner").Result() // If not, throw an error
+	}
+
+	coins, err := keeper.coinKeeper.SubtractCoins(ctx, owner,
+		sdk.NewCoins(sdk.NewInt64Coin(msg.Symbol, msg.Amount)))
+	if err != nil {
+		return sdk.ErrInternal(fmt.Sprintf("failed to burn coins: '%s'", err)).Result()
+	}
+
+	err = keeper.SetTotalSupply(ctx, msg.Symbol, coins)
+	if err != nil {
+		return sdk.ErrInternal(fmt.Sprintf("failed to set total supply when burning coins: '%s'", err)).Result()
 	}
 	return sdk.Result{}
 }
