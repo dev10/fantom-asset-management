@@ -57,14 +57,9 @@ func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg types.MsgMintCoins) 
 		return sdk.ErrUnauthorized("Incorrect Owner").Result() // If not, throw an error
 	}
 
-	amountDec, err := sdk.NewDecFromStr(msg.Amount)
-	if err != nil {
-		return sdk.ErrUnknownRequest(fmt.Sprintf("failed to create decimal from Amount string: %s", err)).Result()
-	}
-
 	// Fix: can't add Dec amount of coins because Cosmos sdk doesn't have AddDecCoins function
 	coins, err := keeper.coinKeeper.AddCoins(ctx, owner,
-		sdk.NewCoins(sdk.NewInt64Coin(msg.Symbol, amountDec.TruncateInt64())))
+		sdk.NewCoins(sdk.NewInt64Coin(msg.Symbol, msg.Amount)))
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to mint coins: '%s'", err)).Result()
 	}

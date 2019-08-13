@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -60,13 +58,13 @@ func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 
 // MsgMintCoins defines the MintCoins message
 type MsgMintCoins struct {
-	Amount string         `json:"amount"`
+	Amount int64          `json:"amount"`
 	Symbol string         `json:"symbol"`
 	Owner  sdk.AccAddress `json:"owner"`
 }
 
 // NewMsgMintCoins is the constructor function for MsgMintCoins
-func NewMsgMintCoins(amount, symbol string, owner sdk.AccAddress) MsgMintCoins {
+func NewMsgMintCoins(amount int64, symbol string, owner sdk.AccAddress) MsgMintCoins {
 	return MsgMintCoins{
 		Amount: amount,
 		Symbol: symbol,
@@ -85,11 +83,11 @@ func (msg MsgMintCoins) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if len(msg.Symbol) == 0 || len(msg.Amount) == 0 {
-		return sdk.ErrUnknownRequest("Symbol and/or Amount cannot be empty")
+	if len(msg.Symbol) == 0 {
+		return sdk.ErrUnknownRequest("Symbol cannot be empty")
 	}
-	if strings.Contains(msg.Amount, "-") {
-		return sdk.ErrUnknownRequest("Amount cannot be negative")
+	if msg.Amount < 1 {
+		return sdk.ErrUnknownRequest("Amount cannot be less than 1")
 	}
 	return nil
 }
@@ -106,13 +104,13 @@ func (msg MsgMintCoins) GetSigners() []sdk.AccAddress {
 
 // MsgBurnCoins defines the BurnCoins message
 type MsgBurnCoins struct {
-	Amount string         `json:"amount"`
+	Amount int64          `json:"amount"`
 	Symbol string         `json:"symbol"`
 	Owner  sdk.AccAddress `json:"owner"`
 }
 
 // NewMsgBurnCoins is the constructor function for MsgBurnCoins
-func NewMsgBurnCoins(amount, symbol string, owner sdk.AccAddress) MsgBurnCoins {
+func NewMsgBurnCoins(amount int64, symbol string, owner sdk.AccAddress) MsgBurnCoins {
 	return MsgBurnCoins{
 		Amount: amount,
 		Symbol: symbol,
@@ -131,11 +129,11 @@ func (msg MsgBurnCoins) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if len(msg.Symbol) == 0 || len(msg.Amount) == 0 {
-		return sdk.ErrUnknownRequest("Symbol and/or Amount cannot be empty")
+	if len(msg.Symbol) == 0 {
+		return sdk.ErrUnknownRequest("Symbol cannot be empty")
 	}
-	if strings.Contains(msg.Amount, "-") {
-		return sdk.ErrUnknownRequest("Amount cannot be negative")
+	if msg.Amount < 1 {
+		return sdk.ErrUnknownRequest("Amount cannot be less than 1")
 	}
 	return nil
 }
@@ -152,13 +150,13 @@ func (msg MsgBurnCoins) GetSigners() []sdk.AccAddress {
 
 // MsgFreezeCoins defines the FreezeCoins message
 type MsgFreezeCoins struct {
-	Amount string         `json:"amount"`
+	Amount int64          `json:"amount"`
 	Symbol string         `json:"symbol"`
 	Owner  sdk.AccAddress `json:"owner"`
 }
 
 // NewMsgFreezeCoins is the constructor function for MsgFreezeCoins
-func NewMsgFreezeCoins(amount, symbol string, owner sdk.AccAddress) MsgFreezeCoins {
+func NewMsgFreezeCoins(amount int64, symbol string, owner sdk.AccAddress) MsgFreezeCoins {
 	return MsgFreezeCoins{
 		Amount: amount,
 		Symbol: symbol,
@@ -177,11 +175,11 @@ func (msg MsgFreezeCoins) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if len(msg.Symbol) == 0 || len(msg.Amount) == 0 {
-		return sdk.ErrUnknownRequest("Symbol and/or Amount cannot be empty")
+	if len(msg.Symbol) == 0 {
+		return sdk.ErrUnknownRequest("Symbol cannot be empty")
 	}
-	if strings.Contains(msg.Amount, "-") {
-		return sdk.ErrUnknownRequest("Amount cannot be negative")
+	if msg.Amount < 0 {
+		return sdk.ErrUnknownRequest("Amount cannot be less than 1")
 	}
 	return nil
 }
@@ -198,13 +196,13 @@ func (msg MsgFreezeCoins) GetSigners() []sdk.AccAddress {
 
 // MsgUnfreezeCoins defines the UnfreezeCoins message
 type MsgUnfreezeCoins struct {
-	Amount string         `json:"amount"`
+	Amount int64          `json:"amount"`
 	Symbol string         `json:"symbol"`
 	Owner  sdk.AccAddress `json:"owner"`
 }
 
 // NewMsgUnfreezeCoins is the constructor function for MsgUnfreezeCoins
-func NewMsgUnfreezeCoins(amount, symbol string, owner sdk.AccAddress) MsgUnfreezeCoins {
+func NewMsgUnfreezeCoins(amount int64, symbol string, owner sdk.AccAddress) MsgUnfreezeCoins {
 	return MsgUnfreezeCoins{
 		Amount: amount,
 		Symbol: symbol,
@@ -223,11 +221,11 @@ func (msg MsgUnfreezeCoins) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if len(msg.Symbol) == 0 || len(msg.Amount) == 0 {
-		return sdk.ErrUnknownRequest("Symbol and/or Amount cannot be empty")
+	if len(msg.Symbol) == 0 {
+		return sdk.ErrUnknownRequest("Symbol cannot be empty")
 	}
-	if strings.Contains(msg.Amount, "-") {
-		return sdk.ErrUnknownRequest("Amount cannot be negative")
+	if msg.Amount < 1 {
+		return sdk.ErrUnknownRequest("Amount cannot be less than 1")
 	}
 	return nil
 }
