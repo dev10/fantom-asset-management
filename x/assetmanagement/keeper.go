@@ -109,7 +109,7 @@ func (k Keeper) SetOwner(ctx sdk.Context, symbol string, owner sdk.AccAddress) e
 }
 
 // GetTotalSupply - gets the current total supply of a symbol
-func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) (sdk.DecCoins, error) {
+func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) (sdk.Coins, error) {
 	token, err := k.GetToken(ctx, symbol)
 	if err == nil {
 		return token.TotalSupply, nil
@@ -118,7 +118,7 @@ func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) (sdk.DecCoins, er
 }
 
 // SetTotalSupply - sets the current total supply of a symbol
-func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, totalSupply sdk.DecCoins) error {
+func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, totalSupply sdk.Coins) error {
 	token, err := k.GetToken(ctx, symbol)
 	if err == nil {
 		token.TotalSupply = totalSupply

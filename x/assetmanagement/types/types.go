@@ -13,26 +13,20 @@ type Token struct {
 	Name           string         `json:"name"`            // token name eg Fantom Chain Token
 	Symbol         string         `json:"symbol"`          // unique token trade symbol eg FTM-000
 	OriginalSymbol string         `json:"original_symbol"` // token symbol eg FTM
-	TotalSupply    sdk.DecCoins   `json:"total_supply"`    // Total token supply
+	TotalSupply    sdk.Coins      `json:"total_supply"`    // Total token supply
 	Mintable       bool           `json:"mintable"`
 }
 
 // NewToken returns a new token
-func NewToken(name, symbol, originalSymbol string, totalSupply string, owner sdk.AccAddress, mintable bool) (*Token, error) {
-	decTotalSupply, err := sdk.NewDecFromStr(totalSupply)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create decimal from total supply string: '%s'", err)
-	}
-
+func NewToken(name, symbol, originalSymbol string, totalSupply int64, owner sdk.AccAddress, mintable bool) *Token {
 	return &Token{
 		Name:           name,
 		Symbol:         symbol,
 		OriginalSymbol: originalSymbol,
-		TotalSupply:    sdk.DecCoins{sdk.NewDecCoinFromDec(symbol, decTotalSupply)},
+		TotalSupply:    sdk.Coins{sdk.NewInt64Coin(symbol, totalSupply)},
 		Owner:          owner,
 		Mintable:       mintable,
-	}, nil
-
+	}
 }
 
 // String implements fmt.Stringer

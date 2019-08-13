@@ -32,14 +32,14 @@ func NewHandler(keeper Keeper) sdk.Handler {
 // handle message to issue token
 func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg types.MsgIssueToken) sdk.Result {
 	var newRandomSymbol = rand.GenerateNewSymbol(msg.Symbol)
-	token, err := types.NewToken(msg.Name, newRandomSymbol, msg.Symbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
-	if err != nil {
-		return sdk.ErrUnknownRequest(fmt.Sprintf("failed to create new token: %s", err)).Result()
+	token := types.NewToken(msg.Name, newRandomSymbol, msg.Symbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
+
+	keeperErr := keeper.coinKeeper.SetCoins(ctx, msg.SourceAddress, token.TotalSupply)
+	if keeperErr != nil {
+		return sdk.ErrUnknownRequest(fmt.Sprintf("failed to store new token in bank: %s", keeperErr)).Result()
 	}
 
-	// keeper.coinKeeper.SetCoins(ctx, msg.SourceAddress, msg.TotalSupply)
-
-	err = keeper.SetToken(ctx, newRandomSymbol, token)
+	err := keeper.SetToken(ctx, newRandomSymbol, token)
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to store new token: '%s'", err)).Result()
 	}

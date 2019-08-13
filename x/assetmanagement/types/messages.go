@@ -13,12 +13,12 @@ type MsgIssueToken struct {
 	SourceAddress sdk.AccAddress `json:"source_address"`
 	Name          string         `json:"name"`
 	Symbol        string         `json:"symbol"`
-	TotalSupply   string         `json:"total_supply"`
+	TotalSupply   int64          `json:"total_supply"`
 	Mintable      bool           `json:"mintable"`
 }
 
 // NewMsgIssueToken is a constructor function for MsgIssueToken
-func NewMsgIssueToken(sourceAddress sdk.AccAddress, name, symbol, totalSupply string, mintable bool) MsgIssueToken {
+func NewMsgIssueToken(sourceAddress sdk.AccAddress, name, symbol string, totalSupply int64, mintable bool) MsgIssueToken {
 	return MsgIssueToken{
 		SourceAddress: sourceAddress,
 		Name:          name,
@@ -39,8 +39,11 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	if msg.SourceAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.SourceAddress.String())
 	}
-	if len(msg.Name) == 0 || len(msg.Symbol) == 0 || len(msg.TotalSupply) == 0 {
-		return sdk.ErrUnknownRequest("Name, Symbol and/or TotalSupply cannot be empty")
+	if len(msg.Name) == 0 || len(msg.Symbol) == 0 {
+		return sdk.ErrUnknownRequest("Name and/or Symbol cannot be empty")
+	}
+	if msg.TotalSupply < 1 {
+		return sdk.ErrUnknownRequest("TotalSupply cannot be less than 1")
 	}
 	return nil
 }
