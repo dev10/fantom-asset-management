@@ -2,6 +2,7 @@ package assetmanagement
 
 import (
 	"fmt"
+
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/rand"
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/types"
 
@@ -91,5 +92,37 @@ func handleMsgBurnCoins(ctx sdk.Context, keeper Keeper, msg types.MsgBurnCoins) 
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to set total supply when burning coins: '%s'", err)).Result()
 	}
+	return sdk.Result{}
+}
+
+// handle message to freeze coins for specific wallet
+func handleMsgFreezeCoins(ctx sdk.Context, keeper Keeper, msg types.MsgFreezeCoins) sdk.Result {
+	owner := msg.Owner
+
+	// Todo: Validate you are allowed access to account?
+	var customAccount types.CustomAccount = keeper.accountKeeper.GetAccount(ctx, owner)
+	err := customAccount.FreezeCoins(sdk.Coins{sdk.NewInt64Coin(msg.Symbol, msg.Amount)})
+	if err != nil {
+		return sdk.ErrInternal(fmt.Sprintf("failed to freeze coins: '%s'", err)).Result()
+	}
+
+	// Save changes to account
+	keeper.accountKeeper.SetAccount(ctx, customAccount)
+	return sdk.Result{}
+}
+
+// handle message to freeze coins for specific wallet
+func handleMsgUnfreezeCoins(ctx sdk.Context, keeper Keeper, msg types.MsgUnfreezeCoins) sdk.Result {
+	owner := msg.Owner
+
+	// Todo: Validate you are allowed access to account?
+	var customAccount types.CustomAccount = keeper.accountKeeper.GetAccount(ctx, owner)
+	err := customAccount.UnfreezeCoins(sdk.Coins{sdk.NewInt64Coin(msg.Symbol, msg.Amount)})
+	if err != nil {
+		return sdk.ErrInternal(fmt.Sprintf("failed to unfreeze coins: '%s'", err)).Result()
+	}
+
+	// Save changes to account
+	keeper.accountKeeper.SetAccount(ctx, customAccount)
 	return sdk.Result{}
 }

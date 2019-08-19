@@ -5,11 +5,30 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 )
+
+// Freezer allows setting and getting frozen coins
+type Freezer interface {
+	// Get just the frozen coins
+	GetFrozenCoins() sdk.Coins
+	SetFrozenCoins(sdk.Coins) error
+
+	// Freeze coins by a certain amount. It will reduce amount of coins available from GetCoins()
+	FreezeCoins(sdk.Coins) error
+	// Unfreeze coins by a certain amount. It will increase the amount of coins available from GetCoins()
+	UnfreezeCoins(sdk.Coins) error
+}
+
+// CustomCoinAccount extends the built in account interface with extra abilities such as frozen coins
+type CustomCoinAccount interface {
+	auth.Account
+	Freezer
+}
 
 // Token is a struct that contains all the metadata of the asset
 type Token struct {
-	Owner          sdk.AccAddress `json:"value"`
+	Owner          sdk.AccAddress `json:"owner"`
 	Name           string         `json:"name"`            // token name eg Fantom Chain Token
 	Symbol         string         `json:"symbol"`          // unique token trade symbol eg FTM-000
 	OriginalSymbol string         `json:"original_symbol"` // token symbol eg FTM

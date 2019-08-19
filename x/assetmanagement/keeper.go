@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/types"
 
@@ -14,7 +15,8 @@ import (
 // Keeper maintains the link to data storage and exposes getter/setter
 // methods for the various parts of the state machine
 type Keeper struct {
-	coinKeeper bank.Keeper
+	accountKeeper auth.AccountKeeper
+	coinKeeper    bank.Keeper
 
 	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
 
