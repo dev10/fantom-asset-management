@@ -26,6 +26,9 @@ func TestFreeze(t *testing.T) {
 	err = account2.FreezeCoins(NewTestCoins(coinSymbol, 0))
 	require.NotNil(t, err)
 
+	err = account2.FreezeCoins(nil)
+	require.NotNil(t, err)
+
 	// Too many coins to freeze
 	err = account2.FreezeCoins(NewTestCoins(coinSymbol, 101))
 	require.NotNil(t, err)
