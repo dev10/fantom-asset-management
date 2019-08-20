@@ -60,10 +60,19 @@ func (acc *CustomAccount) SetFrozenCoins(frozen sdk.Coins) error {
 	return nil
 }
 
+func AreAnyCoinsZero(coins *sdk.Coins) bool {
+	for _, coin := range *coins {
+		if sdk.NewInt(0).Equal(coin.Amount) {
+			return true
+		}
+	}
+	return false
+}
+
 // FreezeCoins freezes unfrozen coins for account according to input
 func (acc *CustomAccount) FreezeCoins(coinsToFreeze sdk.Coins) error {
 	// Have enough coins to freeze?
-	if coinsToFreeze == nil || coinsToFreeze.Empty() || coinsToFreeze.IsAnyNegative() {
+	if coinsToFreeze == nil || coinsToFreeze.Empty() || coinsToFreeze.IsAnyNegative() || AreAnyCoinsZero(&coinsToFreeze) {
 		return sdk.ErrInvalidCoins("No coins chosen to freeze")
 	}
 
@@ -73,7 +82,7 @@ func (acc *CustomAccount) FreezeCoins(coinsToFreeze sdk.Coins) error {
 	}
 
 	// Freeze coins
-	if newBalance, success := currentCoins.SafeSub(coinsToFreeze); success {
+	if newBalance, isNegative := currentCoins.SafeSub(coinsToFreeze); !isNegative {
 		if err := acc.SetCoins(newBalance); err != nil {
 			return sdk.ErrInvalidCoins(fmt.Sprintf("failed to set coins: %s", err))
 		}
@@ -115,7 +124,7 @@ func (acc *CustomAccount) UnfreezeCoins(coinsToUnfreeze sdk.Coins) error {
 		currentCoins = currentCoins.Add(coinsToUnfreeze)
 	}
 
-	if newFrozenBalance, success := currentlyFrozen.SafeSub(coinsToUnfreeze); success {
+	if newFrozenBalance, isNegative := currentlyFrozen.SafeSub(coinsToUnfreeze); !isNegative {
 		if err := acc.SetFrozenCoins(newFrozenBalance); err != nil {
 			return sdk.ErrInvalidCoins(fmt.Sprintf("failed to set frozen coins: %s", err))
 		}
