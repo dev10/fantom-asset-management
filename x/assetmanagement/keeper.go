@@ -130,8 +130,8 @@ func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, totalSupply sdk.C
 	return fmt.Errorf("failed to set total supply for symbol '%s' because: %s", symbol, err)
 }
 
-// GetNamesIterator - Get an iterator over all symbols in which the keys are the symbols and the values are the token
-func (k Keeper) GetNamesIterator(ctx sdk.Context) sdk.Iterator {
+// GetTokensIterator - Get an iterator over all symbols in which the keys are the symbols and the values are the token
+func (k Keeper) GetTokensIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, nil)
 }
