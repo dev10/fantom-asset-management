@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/types"
 
@@ -14,7 +15,8 @@ import (
 // Keeper maintains the link to data storage and exposes getter/setter
 // methods for the various parts of the state machine
 type Keeper struct {
-	coinKeeper bank.Keeper
+	accountKeeper auth.AccountKeeper
+	coinKeeper    bank.Keeper
 
 	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
 
@@ -22,11 +24,12 @@ type Keeper struct {
 }
 
 // NewKeeper creates new instances of the assetmanagement Keeper
-func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
+func NewKeeper(accountKeeper auth.AccountKeeper, coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	return Keeper{
-		coinKeeper: coinKeeper,
-		storeKey:   storeKey,
-		cdc:        cdc,
+		accountKeeper: accountKeeper,
+		coinKeeper:    coinKeeper,
+		storeKey:      storeKey,
+		cdc:           cdc,
 	}
 }
 
@@ -118,10 +121,10 @@ func (k Keeper) GetTotalSupply(ctx sdk.Context, symbol string) (sdk.Coins, error
 }
 
 // SetTotalSupply - sets the current total supply of a symbol
-func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, price sdk.Coins) error {
+func (k Keeper) SetTotalSupply(ctx sdk.Context, symbol string, totalSupply sdk.Coins) error {
 	token, err := k.GetToken(ctx, symbol)
 	if err == nil {
-		token.TotalSupply = price
+		token.TotalSupply = totalSupply
 		return k.SetToken(ctx, symbol, token)
 	}
 	return fmt.Errorf("failed to set total supply for symbol '%s' because: %s", symbol, err)

@@ -23,7 +23,7 @@ An issuance transaction contains:
     Those 3 letters are the first three letters of tx hash of the issue transaction.
 
     For example, "NNF-F90". Only FTM does not have this suffix.
-* **Total Supply**: an int64 boosted by 1e8 for decimal part. The max total supply is 90 billion.
+* **Total Supply**: an int64. The max total supply is 90 billion.
 * **Mintable**: that means whether this token can be minted in the future. To set the tokens to be mintable, you need to add --mintable, otherwise just omit this field to set this token to be non-mintable.
 
 ### Example on **mainnet:**
@@ -52,7 +52,7 @@ An issuance transaction contains:
 
 ## Mint
 
-Tokens that is "mintable" (specified when issue) can use this function. The amount is boosted by **1e8** for decimal part. The total supply after mint is still restricted by 90 billion. 
+Tokens that is "mintable" (specified when issued) can use this function. The total supply after mint is still restricted by 90 billion. 
 
 Note only the `owner` of the token can use this transaction.
 
@@ -70,7 +70,7 @@ Example on **testnet**:
 ## Burn
 Burn is to destroy certain amount of token, after which that amount of tokens will be subtracted from the operator's balance. The total supply will be updated at the same time. 
 
-Notice that only the owner of the token has the permission to burn token. The amount is boosted by **1e8** for decimal part.
+Notice that only the owner of the token has the permission to burn token.
    
 Example on **mainnet:**
 
@@ -87,7 +87,7 @@ Example on **testnet:**
 ## Freeze & Unfreeze
 Freeze would move the specified amount of token into "frozen" status, so that these tokens can not transferred, spent in orders or any other transaction until they are unfreezed.
 
-Anyone can (only) freeze or unfreeze tokens on their account with status in "free". The amount is boosted by 1e8 for decimal part.
+Anyone can (only) freeze or unfreeze tokens on their account with status in "free".
 
 Example on **mainnet:**
 ```bash
