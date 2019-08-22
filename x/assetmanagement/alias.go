@@ -16,6 +16,8 @@ var (
 	NewMsgMintCoins     = types.NewMsgMintCoins
 	NewMsgUnfreezeCoins = types.NewMsgUnfreezeCoins
 
+	NewToken = types.NewToken
+
 	ModuleCdc    = types.ModuleCdc
 	RegisterCode = types.RegisterCodec
 )
@@ -32,6 +34,6 @@ type (
 	QueryResultSymbol = types.QueryResultSymbol
 
 	// state/stored types
-	CustomCoinAccount = types.CustomAccount
-	Token             = types.Token
+	CustomAccount = types.CustomAccount
+	Token         = types.Token
 )

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/rand"
-	"github.com/dev10/fantom-asset-management/x/assetmanagement/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -13,15 +12,15 @@ import (
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case types.MsgIssueToken:
+		case MsgIssueToken:
 			return handleMsgIssueToken(ctx, keeper, msg)
-		case types.MsgMintCoins:
+		case MsgMintCoins:
 			return handleMsgMintCoins(ctx, keeper, msg)
-		case types.MsgBurnCoins:
+		case MsgBurnCoins:
 			return handleMsgBurnCoins(ctx, keeper, msg)
-		case types.MsgFreezeCoins:
+		case MsgFreezeCoins:
 			return handleMsgFreezeCoins(ctx, keeper, msg)
-		case types.MsgUnfreezeCoins:
+		case MsgUnfreezeCoins:
 			return handleMsgUnfreezeCoins(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized assetmanagement Msg type: %v", msg.Type())
@@ -31,9 +30,9 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 // handle message to issue token
-func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg types.MsgIssueToken) sdk.Result {
+func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg MsgIssueToken) sdk.Result {
 	var newRandomSymbol = rand.GenerateNewSymbol(msg.Symbol)
-	token := types.NewToken(msg.Name, newRandomSymbol, msg.Symbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
+	token := NewToken(msg.Name, newRandomSymbol, msg.Symbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
 
 	keeperErr := keeper.coinKeeper.SetCoins(ctx, msg.SourceAddress, token.TotalSupply)
 	if keeperErr != nil {
@@ -48,7 +47,7 @@ func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg types.MsgIssueToken
 }
 
 // handle message to mint coins
-func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg types.MsgMintCoins) sdk.Result {
+func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg MsgMintCoins) sdk.Result {
 	owner, err := keeper.GetOwner(ctx, msg.Symbol)
 	if err != nil {
 		return sdk.ErrUnknownAddress(
@@ -72,7 +71,7 @@ func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg types.MsgMintCoins) 
 }
 
 // handle message to burn coins
-func handleMsgBurnCoins(ctx sdk.Context, keeper Keeper, msg types.MsgBurnCoins) sdk.Result {
+func handleMsgBurnCoins(ctx sdk.Context, keeper Keeper, msg MsgBurnCoins) sdk.Result {
 	owner, err := keeper.GetOwner(ctx, msg.Symbol)
 	if err != nil {
 		return sdk.ErrUnknownAddress(
@@ -96,11 +95,11 @@ func handleMsgBurnCoins(ctx sdk.Context, keeper Keeper, msg types.MsgBurnCoins) 
 }
 
 // handle message to freeze coins for specific wallet
-func handleMsgFreezeCoins(ctx sdk.Context, keeper Keeper, msg types.MsgFreezeCoins) sdk.Result {
+func handleMsgFreezeCoins(ctx sdk.Context, keeper Keeper, msg MsgFreezeCoins) sdk.Result {
 	owner := msg.Owner
 
 	// Todo: Validate you are allowed access to account?
-	var customAccount, ok = keeper.accountKeeper.GetAccount(ctx, owner).(types.CustomAccount)
+	var customAccount, ok = keeper.accountKeeper.GetAccount(ctx, owner).(CustomAccount)
 	if !ok {
 		return sdk.ErrInternal("failed to get correct account type to freeze coins").Result()
 	}
@@ -115,11 +114,11 @@ func handleMsgFreezeCoins(ctx sdk.Context, keeper Keeper, msg types.MsgFreezeCoi
 }
 
 // handle message to freeze coins for specific wallet
-func handleMsgUnfreezeCoins(ctx sdk.Context, keeper Keeper, msg types.MsgUnfreezeCoins) sdk.Result {
+func handleMsgUnfreezeCoins(ctx sdk.Context, keeper Keeper, msg MsgUnfreezeCoins) sdk.Result {
 	owner := msg.Owner
 
 	// Todo: Validate you are allowed access to account?
-	var customAccount, ok = keeper.accountKeeper.GetAccount(ctx, owner).(types.CustomAccount)
+	var customAccount, ok = keeper.accountKeeper.GetAccount(ctx, owner).(CustomAccount)
 	if !ok {
 		return sdk.ErrInternal("failed to get correct account type to unfreeze").Result()
 	}
