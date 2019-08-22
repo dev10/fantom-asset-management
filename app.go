@@ -69,7 +69,7 @@ type fantomAssetManagement struct {
 	tkeyStaking *sdk.TransientStoreKey
 	keyDistr    *sdk.KVStoreKey
 	tkeyDistr   *sdk.TransientStoreKey
-	keyNS       *sdk.KVStoreKey
+	keyAM       *sdk.KVStoreKey
 	keyParams   *sdk.KVStoreKey
 	tkeyParams  *sdk.TransientStoreKey
 	keySlashing *sdk.KVStoreKey
@@ -82,7 +82,7 @@ type fantomAssetManagement struct {
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
-	nsKeeper       assetmanagement.Keeper
+	amKeeper       assetmanagement.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -99,6 +99,18 @@ func NewFantomAssetManagementApp(logger log.Logger, db dbm.DB) *fantomAssetManag
 	var app = &fantomAssetManagement{
 		BaseApp: bApp,
 		cdc:     cdc,
+
+		keyMain:     sdk.NewKVStoreKey(bam.MainStoreKey),
+		keyAccount:  sdk.NewKVStoreKey(auth.StoreKey),
+		keySupply:   sdk.NewKVStoreKey(supply.StoreKey),
+		keyStaking:  sdk.NewKVStoreKey(staking.StoreKey),
+		tkeyStaking: sdk.NewTransientStoreKey(staking.TStoreKey),
+		keyDistr:    sdk.NewKVStoreKey(distr.StoreKey),
+		tkeyDistr:   sdk.NewTransientStoreKey(distr.TStoreKey),
+		keyAM:       sdk.NewKVStoreKey(assetmanagement.StoreKey),
+		keyParams:   sdk.NewKVStoreKey(params.StoreKey),
+		tkeyParams:  sdk.NewTransientStoreKey(params.TStoreKey),
+		keySlashing: sdk.NewKVStoreKey(slashing.StoreKey),
 	}
 
 	return app
