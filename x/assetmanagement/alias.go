@@ -18,8 +18,8 @@ var (
 
 	NewToken = types.NewToken
 
-	ModuleCdc    = types.ModuleCdc
-	RegisterCode = types.RegisterCodec
+	ModuleCdc     = types.ModuleCdc
+	RegisterCodec = types.RegisterCodec
 )
 
 type (
