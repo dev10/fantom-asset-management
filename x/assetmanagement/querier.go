@@ -1,6 +1,8 @@
 package assetmanagement
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -30,10 +32,13 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 // nolint: unparam
 func queryToken(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	token, err := keeper.GetToken(ctx, path[0])
+	if err != nil {
+		panic(fmt.Sprintf("could not get token: %s", err))
+	}
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, token)
 	if err != nil {
-		panic("could not marshal result to JSON")
+		panic(fmt.Sprintf("could not marshal result to JSON: %s", err))
 	}
 
 	return res, nil
