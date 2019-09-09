@@ -12,8 +12,7 @@ require (
 	github.com/coreos/etcd v3.3.13+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
-	github.com/cosmos/cosmos-sdk v0.36.0-rc1
-	github.com/cosmos/sdk-application-tutorial v0.0.0-20190725000014-bf4738a6ee06
+	github.com/cosmos/cosmos-sdk v0.37.0
 	github.com/go-critic/go-critic v0.3.4 // indirect
 	github.com/go-kit/kit v0.9.0 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
@@ -27,6 +26,7 @@ require (
 	github.com/golangci/lint-1 v0.0.0-20181222135242-d2cdd8c08219 // indirect
 	github.com/golangci/revgrep v0.0.0-20180812185044-276a5c0a1039 // indirect
 	github.com/google/pprof v0.0.0-20190723021845-34ac40c74b70 // indirect
+	github.com/gorilla/mux v1.7.0
 	github.com/gostaticanalysis/analysisutil v0.0.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.9.5 // indirect
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
@@ -60,7 +60,8 @@ require (
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.3.0
 	github.com/tendermint/go-amino v0.15.0
-	github.com/tendermint/tendermint v0.32.1
+	github.com/tendermint/tendermint v0.32.2
+	github.com/tendermint/tm-db v0.1.1
 	github.com/timakin/bodyclose v0.0.0-20190721030226-87058b9bfcec // indirect
 	github.com/ugorji/go v1.1.7 // indirect
 	github.com/valyala/fasthttp v1.4.0 // indirect
