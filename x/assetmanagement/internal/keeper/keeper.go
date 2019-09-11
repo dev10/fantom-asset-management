@@ -1,4 +1,4 @@
-package assetmanagement
+package keeper
 
 import (
 	"errors"
@@ -8,13 +8,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 )
 
 // Keeper maintains the link to data storage and exposes getter/setter
 // methods for the various parts of the state machine
 type Keeper struct {
-	accountKeeper auth.AccountKeeper
-	coinKeeper    bank.Keeper
+	AccountKeeper auth.AccountKeeper
+	CoinKeeper    bank.Keeper
 
 	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
 
@@ -24,27 +26,27 @@ type Keeper struct {
 // NewKeeper creates new instances of the assetmanagement Keeper
 func NewKeeper(accountKeeper auth.AccountKeeper, coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	return Keeper{
-		accountKeeper: accountKeeper,
-		coinKeeper:    coinKeeper,
+		AccountKeeper: accountKeeper,
+		CoinKeeper:    coinKeeper,
 		storeKey:      storeKey,
 		cdc:           cdc,
 	}
 }
 
 // GetToken gets the entire Token metadata struct by symbol. False if not found, true otherwise
-func (k Keeper) GetToken(ctx sdk.Context, symbol string) (*Token, error) {
+func (k Keeper) GetToken(ctx sdk.Context, symbol string) (*types.Token, error) {
 	store := ctx.KVStore(k.storeKey)
 	if !k.IsSymbolPresent(ctx, symbol) {
 		return nil, fmt.Errorf("could not find Token for symbol '%s'", symbol)
 	}
 	bz := store.Get([]byte(symbol))
-	var token Token
+	var token types.Token
 	k.cdc.MustUnmarshalBinaryBare(bz, &token)
 	return &token, nil
 }
 
 // SetToken sets the entire Token metadata struct by symbol. Owner must be set. Returns success
-func (k Keeper) SetToken(ctx sdk.Context, symbol string, token *Token) error {
+func (k Keeper) SetToken(ctx sdk.Context, symbol string, token *types.Token) error {
 	if token == nil {
 		return errors.New("unable to store nil/empty token")
 	}

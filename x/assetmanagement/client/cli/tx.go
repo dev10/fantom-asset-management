@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/dev10/fantom-asset-management/x/assetmanagement/types"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 )
 
 var (

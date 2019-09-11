@@ -1,4 +1,4 @@
-package assetmanagement
+package keeper
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 )
 
 // query endpoints supported by the assetmanagement Querier
@@ -46,7 +48,7 @@ func queryToken(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 
 // nolint: unparam
 func querySymbols(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var symbolList QueryResultSymbol
+	var symbolList types.QueryResultSymbol
 
 	iterator := keeper.GetTokensIterator(ctx)
 

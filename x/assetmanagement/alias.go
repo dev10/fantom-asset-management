@@ -1,6 +1,7 @@
 package assetmanagement
 
-import "github.com/dev10/fantom-asset-management/x/assetmanagement/types"
+import "github.com/dev10/fantom-asset-management/x/assetmanagement/internal/keeper"
+import "github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 
 const (
 	ModuleName = types.ModuleName
@@ -9,6 +10,9 @@ const (
 )
 
 var (
+	NewKeeper  = keeper.NewKeeper
+	NewQuerier = keeper.NewQuerier
+
 	// messages
 	NewMsgBurnCoins     = types.NewMsgBurnCoins
 	NewMsgFreezeCoins   = types.NewMsgFreezeCoins
@@ -23,6 +27,8 @@ var (
 )
 
 type (
+	Keeper = keeper.Keeper
+
 	// messages
 	MsgBurnCoins     = types.MsgBurnCoins
 	MsgFreezeCoins   = types.MsgFreezeCoins

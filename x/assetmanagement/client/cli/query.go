@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/dev10/fantom-asset-management/x/assetmanagement/types"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 	"github.com/spf13/cobra"
 )
 

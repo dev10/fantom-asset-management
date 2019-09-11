@@ -34,7 +34,7 @@ func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg MsgIssueToken) sdk.
 	var newRandomSymbol = rand.GenerateNewSymbol(msg.Symbol)
 	token := NewToken(msg.Name, newRandomSymbol, msg.Symbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
 
-	keeperErr := keeper.coinKeeper.SetCoins(ctx, msg.SourceAddress, token.TotalSupply)
+	keeperErr := keeper.CoinKeeper.SetCoins(ctx, msg.SourceAddress, token.TotalSupply)
 	if keeperErr != nil {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("failed to store new token in bank: %s", keeperErr)).Result()
 	}
@@ -57,7 +57,7 @@ func handleMsgMintCoins(ctx sdk.Context, keeper Keeper, msg MsgMintCoins) sdk.Re
 		return sdk.ErrUnauthorized("Incorrect Owner").Result() // If not, throw an error
 	}
 
-	coins, err := keeper.coinKeeper.AddCoins(ctx, owner,
+	coins, err := keeper.CoinKeeper.AddCoins(ctx, owner,
 		sdk.NewCoins(sdk.NewInt64Coin(msg.Symbol, msg.Amount)))
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to mint coins: '%s'", err)).Result()
@@ -81,7 +81,7 @@ func handleMsgBurnCoins(ctx sdk.Context, keeper Keeper, msg MsgBurnCoins) sdk.Re
 		return sdk.ErrUnauthorized("Incorrect Owner").Result() // If not, throw an error
 	}
 
-	coins, err := keeper.coinKeeper.SubtractCoins(ctx, owner,
+	coins, err := keeper.CoinKeeper.SubtractCoins(ctx, owner,
 		sdk.NewCoins(sdk.NewInt64Coin(msg.Symbol, msg.Amount)))
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to burn coins: '%s'", err)).Result()
@@ -99,7 +99,7 @@ func handleMsgFreezeCoins(ctx sdk.Context, keeper Keeper, msg MsgFreezeCoins) sd
 	owner := msg.Owner
 
 	// Todo: Validate you are allowed access to account?
-	var customAccount, ok = keeper.accountKeeper.GetAccount(ctx, owner).(CustomAccount)
+	var customAccount, ok = keeper.AccountKeeper.GetAccount(ctx, owner).(CustomAccount)
 	if !ok {
 		return sdk.ErrInternal("failed to get correct account type to freeze coins").Result()
 	}
@@ -109,7 +109,7 @@ func handleMsgFreezeCoins(ctx sdk.Context, keeper Keeper, msg MsgFreezeCoins) sd
 	}
 
 	// Save changes to account
-	keeper.accountKeeper.SetAccount(ctx, customAccount)
+	keeper.AccountKeeper.SetAccount(ctx, customAccount)
 	return sdk.Result{}
 }
 
@@ -118,7 +118,7 @@ func handleMsgUnfreezeCoins(ctx sdk.Context, keeper Keeper, msg MsgUnfreezeCoins
 	owner := msg.Owner
 
 	// Todo: Validate you are allowed access to account?
-	var customAccount, ok = keeper.accountKeeper.GetAccount(ctx, owner).(CustomAccount)
+	var customAccount, ok = keeper.AccountKeeper.GetAccount(ctx, owner).(CustomAccount)
 	if !ok {
 		return sdk.ErrInternal("failed to get correct account type to unfreeze").Result()
 	}
@@ -128,6 +128,6 @@ func handleMsgUnfreezeCoins(ctx sdk.Context, keeper Keeper, msg MsgUnfreezeCoins
 	}
 
 	// Save changes to account
-	keeper.accountKeeper.SetAccount(ctx, customAccount)
+	keeper.AccountKeeper.SetAccount(ctx, customAccount)
 	return sdk.Result{}
 }
