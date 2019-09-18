@@ -57,6 +57,19 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	return txRootCmd
 }
 
+func flagError2String(name string, err error) string {
+	return fmt.Sprintf("unable to find '%s' flag: %v", name, err)
+}
+
+func fetchStringFlag(cmd *cobra.Command, flagName string) string {
+	flag, err := cmd.Flags().GetString(flagName)
+	if err != nil {
+		panic(flagError2String(flagName, err))
+	}
+
+	return flag
+}
+
 // GetCmdIssueToken is the CLI command for sending a IssueToken transaction
 func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -70,30 +83,18 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			flagError2String := func(name string, err error) string {
-				return fmt.Sprintf("unable to find '%s' flag: %v", err)
-			}
-
 			// find given account
-			sourceAddress, err := cmd.Flags().GetString("from")
-			if err != nil {
-				panic(flagError2String("from", err))
-			}
-			fmt.Printf("token account: %s", sourceAddress)
+			sourceAddress := fetchStringFlag(cmd, "from")
+			address, err := sdk.AccAddressFromBech32(sourceAddress)
+			fmt.Printf("token account: %s / %v", sourceAddress, address)
 
-			name, err := cmd.LocalFlags().GetString("token-name")
-			if err != nil {
-				panic(flagError2String("token-name", err))
-			}
+			name := fetchStringFlag(cmd, "token-name")
+			symbol := fetchStringFlag(cmd, "symbol")
 
-			symbol, err := cmd.LocalFlags().GetString("symbol")
+			flagName := "total-supply"
+			totalSupply, err := cmd.LocalFlags().GetInt64(flagName)
 			if err != nil {
-				panic(flagError2String("symbol", err))
-			}
-
-			totalSupply, err := cmd.LocalFlags().GetInt64("total-supply")
-			if err != nil {
-				panic(flagError2String("total-supply", err))
+				panic(flagError2String(flagName, err))
 			}
 
 			mintable, err := cmd.LocalFlags().GetBool("mintable")
@@ -102,7 +103,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			}
 			fmt.Printf("token is mintable? %t\n", mintable)
 
-			msg := types.NewMsgIssueToken(cliCtx.GetFromAddress(), name, symbol, totalSupply, mintable)
+			msg := types.NewMsgIssueToken(address, name, symbol, totalSupply, mintable)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
