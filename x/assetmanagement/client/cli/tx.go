@@ -102,6 +102,14 @@ func setupInt64Flag(cmd *cobra.Command, name string, shorthand string, value int
 	}
 }
 
+func getAccountAddress(bech32 string) sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(bech32)
+	if err != nil {
+		panic(fmt.Sprintf("failed to get account address from '%s': %v", bech32, err))
+	}
+	return address
+}
+
 // GetCmdIssueToken is the CLI command for sending a IssueToken transaction
 func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -115,9 +123,9 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			// find given account
-			sourceAddress := fetchStringFlag(cmd, "from")
-			address, err := sdk.AccAddressFromBech32(sourceAddress)
-			fmt.Printf("token account: %s / %v", sourceAddress, address)
+			from := fetchStringFlag(cmd, "from")
+			address := getAccountAddress(from)
+			fmt.Printf("token account: %s / %v", from, address)
 
 			name := fetchStringFlag(cmd, "token-name")
 			symbol := fetchStringFlag(cmd, "symbol")
@@ -126,7 +134,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			fmt.Printf("token is mintable? %t\n", mintable)
 
 			msg := types.NewMsgIssueToken(address, name, symbol, totalSupply, mintable)
-			err = msg.ValidateBasic()
+			err := msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
@@ -137,16 +145,17 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 
 	setupBoolFlag(cmd, "mintable", "m", false, "is the new token mintable", false)
 	setupStringFlag(cmd, "token-name", "tn", "", "the name of the new token", true)
-	setupInt64Flag(cmd, "total-supply", "ts", -1, "what is the total supply for the new token", true)
+	setupInt64Flag(cmd, "total-supply", "ts", -1,
+		"what is the total supply for the new token", true)
 	setupStringFlag(cmd, "symbol", "s", "",
-		"what is the shorthand symbol, eg ABC / ABC-123, for the new/existing token", true)
+		"what is the shorthand symbol, eg ABC, for the new token", true)
 
 	return cmd
 }
 
 // GetCmdMintCoins is the CLI command for sending a MintCoins transaction
 func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   `mint --amount [amount] --symbol [ABC-123] --from [account]`,
 		Short: "mint more coins for the specified token",
 		// Args:  cobra.ExactArgs(2),
@@ -159,7 +168,15 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 			// 	return err
 			// }
 
-			msg := types.NewMsgMintCoins()
+			// find given account
+			from := fetchStringFlag(cmd, "from")
+			address := getAccountAddress(from)
+			fmt.Printf("token account: %s / %v", from, address)
+
+			symbol := fetchStringFlag(cmd, "symbol")
+			amount := fetchInt64Flag(cmd, "amount")
+
+			msg := types.NewMsgMintCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -169,6 +186,13 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+
+	setupInt64Flag(cmd, "amount", "a", -1,
+		"what is the total amount of coins to mint for the given token", true)
+	setupStringFlag(cmd, "symbol", "s", "",
+		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
+
+	return cmd
 }
 
 // GetCmdBurnCoins is the CLI command for sending a BurnCoins transaction
