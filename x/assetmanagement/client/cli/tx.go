@@ -235,7 +235,7 @@ func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 
 // GetCmdFreezeCoins is the CLI command for sending a FreezeCoins transaction
 func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   `freeze --amount [amount] --symbol [ABC-123] --from [account]`,
 		Short: "move specified amount of token/coins into frozen status, preventing their sale",
 		// Args:  cobra.ExactArgs(1),
@@ -244,7 +244,15 @@ func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			msg := types.NewMsgFreezeCoins()
+			// find given account
+			from := fetchStringFlag(cmd, "from")
+			address := getAccountAddress(from)
+			fmt.Printf("token account: %s / %v", from, address)
+
+			symbol := fetchStringFlag(cmd, "symbol")
+			amount := fetchInt64Flag(cmd, "amount")
+
+			msg := types.NewMsgFreezeCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -254,6 +262,13 @@ func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+
+	setupInt64Flag(cmd, "amount", "a", -1,
+		"what is the total amount of coins to freeze for the given token", true)
+	setupStringFlag(cmd, "symbol", "s", "",
+		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
+
+	return cmd
 }
 
 // GetCmdUnfreezeCoins is the CLI command for sending a FreezeCoins transaction
