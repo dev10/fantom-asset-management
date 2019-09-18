@@ -70,17 +70,35 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
+			flagError2String := func(name string, err error) string {
+				return fmt.Sprintf("unable to find '%s' flag: %v", err)
+			}
+
 			// find given account
 			sourceAddress, err := cmd.Flags().GetString("from")
 			if err != nil {
-				panic(fmt.Sprintf("unable to find 'from' flag: %v", err))
+				panic(flagError2String("from", err))
 			}
 			fmt.Printf("token account: %s", sourceAddress)
 
-			// mintable
+			name, err := cmd.LocalFlags().GetString("token-name")
+			if err != nil {
+				panic(flagError2String("token-name", err))
+			}
+
+			symbol, err := cmd.LocalFlags().GetString("symbol")
+			if err != nil {
+				panic(flagError2String("symbol", err))
+			}
+
+			totalSupply, err := cmd.LocalFlags().GetInt64("total-supply")
+			if err != nil {
+				panic(flagError2String("total-supply", err))
+			}
+
 			mintable, err := cmd.LocalFlags().GetBool("mintable")
 			if err != nil {
-				panic(fmt.Sprintf("unable to find 'mintable' flag: %v", err))
+				panic(flagError2String("mintable", err))
 			}
 			fmt.Printf("token is mintable? %t\n", mintable)
 
