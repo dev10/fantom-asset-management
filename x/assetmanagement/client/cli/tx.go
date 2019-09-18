@@ -15,10 +15,7 @@ import (
 )
 
 var (
-	_chainId   string
-	_from      string
-	_node      string
-	_trustNode bool
+	_from string
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
@@ -29,21 +26,10 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txRootCmd.PersistentFlags().StringVarP(&_chainId, "chain-id", "ci", "", "the chain id")
 	txRootCmd.PersistentFlags().StringVarP(&_from, "from", "f", "", "the account")
-	txRootCmd.PersistentFlags().StringVarP(&_node, "node", "n", "", "the node URL to connect to")
-	txRootCmd.PersistentFlags().BoolVarP(&_trustNode, "trust-node", "tn", false, "whether to trust the specified node")
-	err := txRootCmd.MarkPersistentFlagRequired("chain-id")
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup 'chain-id' flag: %s", err))
-	}
-	err = txRootCmd.MarkPersistentFlagRequired("from")
+	err := txRootCmd.MarkPersistentFlagRequired("from")
 	if err != nil {
 		panic(fmt.Sprintf("failed to setup 'from' flag: %s", err))
-	}
-	err = txRootCmd.MarkPersistentFlagRequired("node")
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup 'node' flag: %s", err))
 	}
 
 	txRootCmd.AddCommand(client.PostCommands(
@@ -120,8 +106,7 @@ func setupInt64Flag(cmd *cobra.Command, name string, shorthand string, value int
 func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: `issue --token-name [name] --total-supply [amount]
-			--symbol [ABC] --mintable --from [account] --chain-id [name]
-			--node [URL] --trust-node`,
+			--symbol [ABC] --mintable --from [account]`,
 		Short: "create a new asset",
 		// Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -162,8 +147,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 // GetCmdMintCoins is the CLI command for sending a MintCoins transaction
 func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use: `mint --amount [amount] --symbol [ABC-123] --from [account]
-			--chain-id [name] --node [URL] --trust-node`,
+		Use:   `mint --amount [amount] --symbol [ABC-123] --from [account]`,
 		Short: "mint more coins for the specified token",
 		// Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -190,8 +174,7 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 // GetCmdBurnCoins is the CLI command for sending a BurnCoins transaction
 func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use: `burn --amount [amount] --symbol [ABC-123] --from [account]
-			--chain-id [name] --node [URL] --trust-node`,
+		Use:   `burn --amount [amount] --symbol [ABC-123] --from [account]`,
 		Short: "destroy the given amount of token/coins, reducing the total supply",
 		// Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -214,8 +197,7 @@ func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 // GetCmdFreezeCoins is the CLI command for sending a FreezeCoins transaction
 func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use: `freeze --amount [amount] --symbol [ABC-123] --from [account]
-			--chain-id [name] --node [URL] --trust-node`,
+		Use:   `freeze --amount [amount] --symbol [ABC-123] --from [account]`,
 		Short: "move specified amount of token/coins into frozen status, preventing their sale",
 		// Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -238,8 +220,7 @@ func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 // GetCmdUnfreezeCoins is the CLI command for sending a FreezeCoins transaction
 func GetCmdUnfreezeCoins(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use: `unfreeze --amount [amount] --symbol [ABC-123] --from [account]
-			--chain-id [name] --node [URL] --trust-node`,
+		Use:   `unfreeze --amount [amount] --symbol [ABC-123] --from [account]`,
 		Short: "move specified amount of token into frozen status, preventing their sale",
 		// Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
