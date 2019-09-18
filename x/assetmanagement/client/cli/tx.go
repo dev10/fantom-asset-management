@@ -3,14 +3,14 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"github.com/spf13/cobra"
+
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 )
 
@@ -88,6 +88,34 @@ func fetchBoolFlag(cmd *cobra.Command, flagName string) bool {
 	return flag
 }
 
+func setupRequiredFlag(cmd *cobra.Command, name string) {
+	err := cmd.MarkFlagRequired(name)
+	if err != nil {
+		panic(fmt.Sprintf("failed to setup '%s' flag: %s", name, err))
+	}
+}
+
+func setupBoolFlag(cmd *cobra.Command, name string, shorthand string, value bool, usage string, required bool) {
+	cmd.Flags().BoolP(name, shorthand, value, usage)
+	if required {
+		setupRequiredFlag(cmd, name)
+	}
+}
+
+func setupStringFlag(cmd *cobra.Command, name string, shorthand string, value string, usage string, required bool) {
+	cmd.Flags().StringP(name, shorthand, value, usage)
+	if required {
+		setupRequiredFlag(cmd, name)
+	}
+}
+
+func setupInt64Flag(cmd *cobra.Command, name string, shorthand string, value int64, usage string, required bool) {
+	cmd.Flags().Int64P(name, shorthand, value, usage)
+	if required {
+		setupRequiredFlag(cmd, name)
+	}
+}
+
 // GetCmdIssueToken is the CLI command for sending a IssueToken transaction
 func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -121,26 +149,12 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
-	cmd.Flags().BoolP("mintable", "m", false, "is the new token mintable")
-	cmd.Flags().StringP("token-name", "tn", "", "the name of the new token")
-	cmd.Flags().Int64P("total-supply", "ts", -1, "what is the total supply for the new token")
-	cmd.Flags().StringP("symbol", "s", "",
-		"what is the shorthand symbol, eg ABC / ABC-123, for the new/existing token")
 
-	err := cmd.MarkFlagRequired("token-name")
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup 'token-name' flag: %s", err))
-	}
-
-	err = cmd.MarkFlagRequired("total-supply")
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup 'total-supply' flag: %s", err))
-	}
-
-	err = cmd.MarkFlagRequired("symbol")
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup 'symbol' flag: %s", err))
-	}
+	setupBoolFlag(cmd, "mintable", "m", false, "is the new token mintable", false)
+	setupStringFlag(cmd, "token-name", "tn", "", "the name of the new token", true)
+	setupInt64Flag(cmd, "total-supply", "ts", -1, "what is the total supply for the new token", true)
+	setupStringFlag(cmd, "symbol", "s", "",
+		"what is the shorthand symbol, eg ABC / ABC-123, for the new/existing token", true)
 
 	return cmd
 }
