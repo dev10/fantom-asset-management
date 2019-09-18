@@ -70,6 +70,24 @@ func fetchStringFlag(cmd *cobra.Command, flagName string) string {
 	return flag
 }
 
+func fetchInt64Flag(cmd *cobra.Command, flagName string) int64 {
+	flag, err := cmd.Flags().GetInt64(flagName)
+	if err != nil {
+		panic(flagError2String(flagName, err))
+	}
+
+	return flag
+}
+
+func fetchBoolFlag(cmd *cobra.Command, flagName string) bool {
+	flag, err := cmd.Flags().GetBool(flagName)
+	if err != nil {
+		panic(flagError2String(flagName, err))
+	}
+
+	return flag
+}
+
 // GetCmdIssueToken is the CLI command for sending a IssueToken transaction
 func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -90,17 +108,8 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 
 			name := fetchStringFlag(cmd, "token-name")
 			symbol := fetchStringFlag(cmd, "symbol")
-
-			flagName := "total-supply"
-			totalSupply, err := cmd.LocalFlags().GetInt64(flagName)
-			if err != nil {
-				panic(flagError2String(flagName, err))
-			}
-
-			mintable, err := cmd.LocalFlags().GetBool("mintable")
-			if err != nil {
-				panic(flagError2String("mintable", err))
-			}
+			totalSupply := fetchInt64Flag(cmd, "total-supply")
+			mintable := fetchBoolFlag(cmd, "mintable")
 			fmt.Printf("token is mintable? %t\n", mintable)
 
 			msg := types.NewMsgIssueToken(address, name, symbol, totalSupply, mintable)
