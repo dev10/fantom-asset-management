@@ -5,7 +5,6 @@ go 1.12
 require (
 	bou.ke/monkey v1.0.1 // indirect
 	cloud.google.com/go v0.43.0 // indirect
-	github.com/OpenPeeDeeP/depguard v1.0.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/coreos/bbolt v1.3.3 // indirect
@@ -13,17 +12,11 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/cosmos/cosmos-sdk v0.37.0
-	github.com/go-critic/go-critic v0.3.4 // indirect
 	github.com/go-kit/kit v0.9.0 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
-	github.com/golangci/errcheck v0.0.0-20181223084120-ef45e06d44b6 // indirect
-	github.com/golangci/go-tools v0.0.0-20190124090046-35a9f45a5db0 // indirect
 	github.com/golangci/gocyclo v0.0.0-20180528144436-0a533e8fa43d // indirect
-	github.com/golangci/gofmt v0.0.0-20181222123516-0b8337e80d98 // indirect
-	github.com/golangci/golangci-lint v1.17.1 // indirect
-	github.com/golangci/gosec v0.0.0-20180901114220-8afd9cbb6cfb // indirect
-	github.com/golangci/lint-1 v0.0.0-20181222135242-d2cdd8c08219 // indirect
+		github.com/golangci/golangci-lint v1.18.0 // indirect
 	github.com/golangci/revgrep v0.0.0-20180812185044-276a5c0a1039 // indirect
 	github.com/google/pprof v0.0.0-20190723021845-34ac40c74b70 // indirect
 	github.com/gorilla/mux v1.7.0
@@ -62,7 +55,6 @@ require (
 	github.com/tendermint/go-amino v0.15.0
 	github.com/tendermint/tendermint v0.32.2
 	github.com/tendermint/tm-db v0.1.1
-	github.com/timakin/bodyclose v0.0.0-20190721030226-87058b9bfcec // indirect
 	github.com/ugorji/go v1.1.7 // indirect
 	github.com/valyala/fasthttp v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
@@ -70,7 +62,6 @@ require (
 	golang.org/x/image v0.0.0-20190729225735-1bd0cf576493 // indirect
 	golang.org/x/mobile v0.0.0-20190719004257-d2bd2a29d028 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
-	golang.org/x/tools v0.0.0-20190807223507-b346f7fd45de // indirect
 	google.golang.org/grpc v1.22.1 // indirect
 	honnef.co/go/tools v0.0.1-2019.2.2 // indirect
 	mvdan.cc/unparam v0.0.0-20190720180237-d51796306d8f // indirect
