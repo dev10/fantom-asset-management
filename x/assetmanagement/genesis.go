@@ -44,6 +44,7 @@ func DefaultGenesisState() GenesisState {
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
 	for _, record := range data.TokenRecords {
+		record := record
 		err := keeper.SetToken(ctx, record.Symbol, &record)
 		if err != nil {
 			panic(fmt.Sprintf("failed to set token for symbol: %s. Error: %s", record.Symbol, err))
