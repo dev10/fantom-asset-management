@@ -16,7 +16,8 @@ type MsgIssueToken struct {
 }
 
 // NewMsgIssueToken is a constructor function for MsgIssueToken
-func NewMsgIssueToken(sourceAddress sdk.AccAddress, name, symbol string, totalSupply int64, mintable bool) MsgIssueToken {
+func NewMsgIssueToken(sourceAddress sdk.AccAddress, name, symbol string,
+	totalSupply int64, mintable bool) MsgIssueToken {
 	return MsgIssueToken{
 		SourceAddress: sourceAddress,
 		Name:          name,

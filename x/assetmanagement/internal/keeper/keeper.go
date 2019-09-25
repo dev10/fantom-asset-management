@@ -24,7 +24,8 @@ type Keeper struct {
 }
 
 // NewKeeper creates new instances of the assetmanagement Keeper
-func NewKeeper(accountKeeper auth.AccountKeeper, coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
+func NewKeeper(accountKeeper auth.AccountKeeper, coinKeeper bank.Keeper, storeKey sdk.StoreKey,
+	cdc *codec.Codec) Keeper {
 	return Keeper{
 		AccountKeeper: accountKeeper,
 		CoinKeeper:    coinKeeper,
