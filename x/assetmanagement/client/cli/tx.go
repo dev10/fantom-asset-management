@@ -168,13 +168,7 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 			// 	return err
 			// }
 
-			// find given account
-			from := fetchStringFlag(cmd, "from")
-			address := getAccountAddress(from)
-			fmt.Printf("token account: %s / %v", from, address)
-
-			symbol := fetchStringFlag(cmd, "symbol")
-			amount := fetchInt64Flag(cmd, "amount")
+			address, symbol, amount := getCommonParameters(cmd)
 
 			msg := types.NewMsgMintCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
@@ -195,6 +189,17 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+func getCommonParameters(cmd *cobra.Command) (sdk.AccAddress, string, int64) {
+	// find given account
+	from := fetchStringFlag(cmd, "from")
+	address := getAccountAddress(from)
+	fmt.Printf("token account: %s / %v", from, address)
+
+	symbol := fetchStringFlag(cmd, "symbol")
+	amount := fetchInt64Flag(cmd, "amount")
+	return address, symbol, amount
+}
+
 // GetCmdBurnCoins is the CLI command for sending a BurnCoins transaction
 func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -206,13 +211,7 @@ func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			// find given account
-			from := fetchStringFlag(cmd, "from")
-			address := getAccountAddress(from)
-			fmt.Printf("token account: %s / %v", from, address)
-
-			symbol := fetchStringFlag(cmd, "symbol")
-			amount := fetchInt64Flag(cmd, "amount")
+			address, symbol, amount := getCommonParameters(cmd)
 
 			msg := types.NewMsgBurnCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
@@ -244,13 +243,7 @@ func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			// find given account
-			from := fetchStringFlag(cmd, "from")
-			address := getAccountAddress(from)
-			fmt.Printf("token account: %s / %v", from, address)
-
-			symbol := fetchStringFlag(cmd, "symbol")
-			amount := fetchInt64Flag(cmd, "amount")
+			address, symbol, amount := getCommonParameters(cmd)
 
 			msg := types.NewMsgFreezeCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
@@ -282,13 +275,7 @@ func GetCmdUnfreezeCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			// find given account
-			from := fetchStringFlag(cmd, "from")
-			address := getAccountAddress(from)
-			fmt.Printf("token account: %s / %v", from, address)
-
-			symbol := fetchStringFlag(cmd, "symbol")
-			amount := fetchInt64Flag(cmd, "amount")
+			address, symbol, amount := getCommonParameters(cmd)
 
 			msg := types.NewMsgUnfreezeCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
