@@ -1,7 +1,9 @@
 package assetmanagement
 
-import "github.com/dev10/fantom-asset-management/x/assetmanagement/internal/keeper"
-import "github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
+import (
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/keeper"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
+)
 
 const (
 	ModuleName = types.ModuleName
