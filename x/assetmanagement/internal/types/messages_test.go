@@ -181,3 +181,20 @@ func TestMsgBurnCoinsValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestMsgBurnCoinsGetSignBytes(t *testing.T) {
+	var (
+		amount int64 = 100
+		symbol       = "ZAP-999"
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgBurnCoins(amount, symbol, owner)
+	)
+	actual := msg.GetSignBytes()
+
+	expected := `{"type":"assetmanagement/BurnCoins","value":{` +
+		`"amount":"100",` +
+		`"owner":"cosmos1d4js690r9j",` +
+		`"symbol":"ZAP-999"}}`
+
+	require.Equal(t, expected, string(actual))
+}
