@@ -120,3 +120,20 @@ func TestMsgMintCoinsValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestMsgMintCoinsGetSignBytes(t *testing.T) {
+	var (
+		amount int64 = 10
+		symbol       = "ZAP-001"
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgMintCoins(amount, symbol, owner)
+	)
+	actual := msg.GetSignBytes()
+
+	expected := `{"type":"assetmanagement/MintCoins","value":{` +
+		`"amount":"10",` +
+		`"owner":"cosmos1d4js690r9j",` +
+		`"symbol":"ZAP-001"}}`
+
+	require.Equal(t, expected, string(actual))
+}
