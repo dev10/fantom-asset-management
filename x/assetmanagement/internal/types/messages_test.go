@@ -90,3 +90,33 @@ func TestMsgMintCoins(t *testing.T) {
 	require.Equal(t, msg.Route(), RouterKey)
 	require.Equal(t, msg.Type(), "mint_coins")
 }
+
+func TestMsgMintCoinsValidation(t *testing.T) {
+	var (
+		amount  int64 = 10
+		symbol        = "ZAP-001"
+		symbol2       = "a"
+		owner         = sdk.AccAddress([]byte("me"))
+		owner2        = sdk.AccAddress([]byte("you"))
+	)
+
+	cases := []struct {
+		valid bool
+		tx    MsgMintCoins
+	}{
+		{true, NewMsgMintCoins(amount, symbol, owner)},
+		{true, NewMsgMintCoins(amount, symbol2, owner2)},
+		{false, NewMsgMintCoins(0, symbol, owner)},
+		{false, NewMsgMintCoins(amount, symbol, nil)},
+		{false, NewMsgMintCoins(amount, "", owner)},
+	}
+
+	for _, tc := range cases {
+		err := tc.tx.ValidateBasic()
+		if tc.valid {
+			require.Nil(t, err, fmt.Sprintf("transaction [%v] failed but was marked valid", tc))
+		} else {
+			require.NotNil(t, err, fmt.Sprintf("transaction [%v] is valid but has an error", tc))
+		}
+	}
+}
