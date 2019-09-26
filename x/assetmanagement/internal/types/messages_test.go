@@ -57,3 +57,24 @@ func TestMsgIssueTokenValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestMsgIssueTokenGetSignBytes(t *testing.T) {
+	var (
+		name         = "Zap"
+		symbol       = "ZAP"
+		total  int64 = 1
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgIssueToken(owner, name, symbol, total, false)
+	)
+	actual := msg.GetSignBytes()
+
+	expected := `{"type":"assetmanagement/IssueToken",` +
+		`"value":{` +
+		`"mintable":false,` +
+		`"name":"Zap",` +
+		`"source_address":"cosmos1d4js690r9j",` +
+		`"symbol":"ZAP",` +
+		`"total_supply":"1"}}`
+
+	require.Equal(t, expected, string(actual))
+}
