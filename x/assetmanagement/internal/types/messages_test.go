@@ -95,7 +95,7 @@ func TestMsgMintCoinsValidation(t *testing.T) {
 	var (
 		amount  int64 = 10
 		symbol        = "ZAP-001"
-		symbol2       = "a"
+		symbol2       = "MNT-500"
 		owner         = sdk.AccAddress([]byte("me"))
 		owner2        = sdk.AccAddress([]byte("you"))
 	)
@@ -106,7 +106,9 @@ func TestMsgMintCoinsValidation(t *testing.T) {
 	}{
 		{true, NewMsgMintCoins(amount, symbol, owner)},
 		{true, NewMsgMintCoins(amount, symbol2, owner2)},
+		{false, NewMsgMintCoins(-1, symbol, owner)},
 		{false, NewMsgMintCoins(0, symbol, owner)},
+		{true, NewMsgMintCoins(1, symbol, owner)},
 		{false, NewMsgMintCoins(amount, symbol, nil)},
 		{false, NewMsgMintCoins(amount, "", owner)},
 	}
