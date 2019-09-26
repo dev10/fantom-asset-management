@@ -137,3 +137,15 @@ func TestMsgMintCoinsGetSignBytes(t *testing.T) {
 
 	require.Equal(t, expected, string(actual))
 }
+
+func TestMsgBurnCoins(t *testing.T) {
+	var (
+		amount int64 = 10
+		symbol       = "ZAP-001"
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgBurnCoins(amount, symbol, owner)
+	)
+
+	require.Equal(t, msg.Route(), RouterKey)
+	require.Equal(t, msg.Type(), "burn_coins")
+}
