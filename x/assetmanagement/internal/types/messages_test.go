@@ -149,3 +149,35 @@ func TestMsgBurnCoins(t *testing.T) {
 	require.Equal(t, msg.Route(), RouterKey)
 	require.Equal(t, msg.Type(), "burn_coins")
 }
+
+func TestMsgBurnCoinsValidation(t *testing.T) {
+	var (
+		amount  int64 = 20
+		symbol        = "ZAP-001"
+		symbol2       = "BRN-002"
+		owner         = sdk.AccAddress([]byte("me"))
+		owner2        = sdk.AccAddress([]byte("you"))
+	)
+
+	cases := []struct {
+		valid bool
+		tx    MsgBurnCoins
+	}{
+		{true, NewMsgBurnCoins(amount, symbol, owner)},
+		{true, NewMsgBurnCoins(amount, symbol2, owner2)},
+		{false, NewMsgBurnCoins(-1, symbol, owner)},
+		{false, NewMsgBurnCoins(0, symbol, owner)},
+		{true, NewMsgBurnCoins(1, symbol, owner)},
+		{false, NewMsgBurnCoins(amount, symbol, nil)},
+		{false, NewMsgBurnCoins(amount, "", owner)},
+	}
+
+	for _, tc := range cases {
+		err := tc.tx.ValidateBasic()
+		if tc.valid {
+			require.Nil(t, err)
+		} else {
+			require.NotNil(t, err)
+		}
+	}
+}
