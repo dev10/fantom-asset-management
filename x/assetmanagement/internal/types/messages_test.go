@@ -252,7 +252,7 @@ func TestMsgFreezeCoinsGetSignBytes(t *testing.T) {
 	require.Equal(t, expected, string(actual))
 }
 
-func TestMsgUnreezeCoins(t *testing.T) {
+func TestMsgUnfreezeCoins(t *testing.T) {
 	var (
 		amount int64 = 10
 		symbol       = "UFZ-001"
@@ -287,4 +287,21 @@ func TestMsgUnfreezeCoinsValidation(t *testing.T) {
 	}
 
 	validateError(cases, t)
+}
+
+func TestMsgUnfreezeCoinsGetSignBytes(t *testing.T) {
+	var (
+		amount int64 = 100
+		symbol       = "UFZ-999"
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgUnfreezeCoins(amount, symbol, owner)
+	)
+	actual := msg.GetSignBytes()
+
+	expected := `{"type":"assetmanagement/UnfreezeCoins","value":{` +
+		`"amount":"100",` +
+		`"owner":"cosmos1d4js690r9j",` +
+		`"symbol":"UFZ-999"}}`
+
+	require.Equal(t, expected, string(actual))
 }
