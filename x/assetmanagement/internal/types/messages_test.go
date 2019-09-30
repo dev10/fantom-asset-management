@@ -8,6 +8,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type MsgInterface interface{ sdk.Msg }
+
+func validateError(cases []struct {
+	valid bool
+	tx    MsgInterface
+}, t *testing.T) {
+	for i, tc := range cases {
+		err := tc.tx.ValidateBasic()
+		if tc.valid {
+			require.Nil(t, err, fmt.Sprintf("transaction [no: %d] [%v] failed but was marked valid", i, tc))
+		} else {
+			require.NotNil(t, err, fmt.Sprintf("transaction [no: %d] [%v] is valid but has an error", i, tc))
+		}
+	}
+}
+
+// Tests
+
 func TestMsgIssueToken(t *testing.T) {
 	var (
 		name         = "Zap"
@@ -35,7 +53,7 @@ func TestMsgIssueTokenValidation(t *testing.T) {
 
 	cases := []struct {
 		valid bool
-		tx    MsgIssueToken
+		tx    MsgInterface
 	}{
 		{true, NewMsgIssueToken(acc, name, symbol, total, false)},
 		{true, NewMsgIssueToken(acc, name, symbol, total, false)},
@@ -48,14 +66,7 @@ func TestMsgIssueTokenValidation(t *testing.T) {
 		{false, NewMsgIssueToken(acc2, name, symbol, totalInvalid, false)},
 	}
 
-	for _, tc := range cases {
-		err := tc.tx.ValidateBasic()
-		if tc.valid {
-			require.Nil(t, err, fmt.Sprintf("transaction [%v] failed but was marked valid", tc))
-		} else {
-			require.NotNil(t, err, fmt.Sprintf("transaction [%v] is valid but has an error", tc))
-		}
-	}
+	validateError(cases, t)
 }
 
 func TestMsgIssueTokenGetSignBytes(t *testing.T) {
@@ -102,7 +113,7 @@ func TestMsgMintCoinsValidation(t *testing.T) {
 
 	cases := []struct {
 		valid bool
-		tx    MsgMintCoins
+		tx    MsgInterface
 	}{
 		{true, NewMsgMintCoins(amount, symbol, owner)},
 		{true, NewMsgMintCoins(amount, symbol2, owner2)},
@@ -113,14 +124,7 @@ func TestMsgMintCoinsValidation(t *testing.T) {
 		{false, NewMsgMintCoins(amount, "", owner)},
 	}
 
-	for _, tc := range cases {
-		err := tc.tx.ValidateBasic()
-		if tc.valid {
-			require.Nil(t, err, fmt.Sprintf("transaction [%v] failed but was marked valid", tc))
-		} else {
-			require.NotNil(t, err, fmt.Sprintf("transaction [%v] is valid but has an error", tc))
-		}
-	}
+	validateError(cases, t)
 }
 
 func TestMsgMintCoinsGetSignBytes(t *testing.T) {
@@ -163,7 +167,7 @@ func TestMsgBurnCoinsValidation(t *testing.T) {
 
 	cases := []struct {
 		valid bool
-		tx    MsgBurnCoins
+		tx    MsgInterface
 	}{
 		{true, NewMsgBurnCoins(amount, symbol, owner)},
 		{true, NewMsgBurnCoins(amount, symbol2, owner2)},
@@ -174,14 +178,7 @@ func TestMsgBurnCoinsValidation(t *testing.T) {
 		{false, NewMsgBurnCoins(amount, "", owner)},
 	}
 
-	for _, tc := range cases {
-		err := tc.tx.ValidateBasic()
-		if tc.valid {
-			require.Nil(t, err)
-		} else {
-			require.NotNil(t, err)
-		}
-	}
+	validateError(cases, t)
 }
 
 func TestMsgBurnCoinsGetSignBytes(t *testing.T) {
@@ -211,4 +208,29 @@ func TestMsgFreezeCoins(t *testing.T) {
 
 	require.Equal(t, msg.Route(), RouterKey)
 	require.Equal(t, msg.Type(), "freeze_coins")
+}
+
+func TestMsgFreezeCoinsValidation(t *testing.T) {
+	var (
+		amount  int64 = 15
+		symbol        = "ZAP-001"
+		symbol2       = "FRZ-112"
+		owner         = sdk.AccAddress([]byte("me"))
+		owner2        = sdk.AccAddress([]byte("you"))
+	)
+
+	cases := []struct {
+		valid bool
+		tx    MsgInterface
+	}{
+		{true, NewMsgFreezeCoins(amount, symbol, owner)},
+		{true, NewMsgFreezeCoins(amount, symbol2, owner2)},
+		{false, NewMsgFreezeCoins(-1, symbol, owner)},
+		{false, NewMsgFreezeCoins(0, symbol, owner)},
+		{true, NewMsgFreezeCoins(1, symbol, owner)},
+		{false, NewMsgFreezeCoins(amount, symbol, nil)},
+		{false, NewMsgFreezeCoins(amount, "", owner)},
+	}
+
+	validateError(cases, t)
 }
