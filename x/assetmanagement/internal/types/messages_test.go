@@ -234,3 +234,20 @@ func TestMsgFreezeCoinsValidation(t *testing.T) {
 
 	validateError(cases, t)
 }
+
+func TestMsgFreezeCoinsGetSignBytes(t *testing.T) {
+	var (
+		amount int64 = 100
+		symbol       = "FRZ-999"
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgFreezeCoins(amount, symbol, owner)
+	)
+	actual := msg.GetSignBytes()
+
+	expected := `{"type":"assetmanagement/FreezeCoins","value":{` +
+		`"amount":"100",` +
+		`"owner":"cosmos1d4js690r9j",` +
+		`"symbol":"FRZ-999"}}`
+
+	require.Equal(t, expected, string(actual))
+}
