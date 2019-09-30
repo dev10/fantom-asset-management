@@ -263,3 +263,28 @@ func TestMsgUnreezeCoins(t *testing.T) {
 	require.Equal(t, msg.Route(), RouterKey)
 	require.Equal(t, msg.Type(), "unfreeze_coins")
 }
+
+func TestMsgUnfreezeCoinsValidation(t *testing.T) {
+	var (
+		amount  int64 = 15
+		symbol        = "ZAP-001"
+		symbol2       = "UFZ-130"
+		owner         = sdk.AccAddress([]byte("me"))
+		owner2        = sdk.AccAddress([]byte("you"))
+	)
+
+	cases := []struct {
+		valid bool
+		tx    MsgInterface
+	}{
+		{true, NewMsgUnfreezeCoins(amount, symbol, owner)},
+		{true, NewMsgUnfreezeCoins(amount, symbol2, owner2)},
+		{false, NewMsgUnfreezeCoins(-1, symbol, owner)},
+		{false, NewMsgUnfreezeCoins(0, symbol, owner)},
+		{true, NewMsgUnfreezeCoins(1, symbol, owner)},
+		{false, NewMsgUnfreezeCoins(amount, symbol, nil)},
+		{false, NewMsgUnfreezeCoins(amount, "", owner)},
+	}
+
+	validateError(cases, t)
+}
