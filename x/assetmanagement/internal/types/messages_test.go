@@ -251,3 +251,15 @@ func TestMsgFreezeCoinsGetSignBytes(t *testing.T) {
 
 	require.Equal(t, expected, string(actual))
 }
+
+func TestMsgUnreezeCoins(t *testing.T) {
+	var (
+		amount int64 = 10
+		symbol       = "UFZ-001"
+		owner        = sdk.AccAddress([]byte("me"))
+		msg          = NewMsgUnfreezeCoins(amount, symbol, owner)
+	)
+
+	require.Equal(t, msg.Route(), RouterKey)
+	require.Equal(t, msg.Type(), "unfreeze_coins")
+}
