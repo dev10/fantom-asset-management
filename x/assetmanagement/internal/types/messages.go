@@ -179,7 +179,7 @@ func (msg MsgFreezeCoins) ValidateBasic() sdk.Error {
 	if len(msg.Symbol) == 0 {
 		return sdk.ErrUnknownRequest("Symbol cannot be empty")
 	}
-	if msg.Amount < 0 {
+	if msg.Amount < 1 {
 		return sdk.ErrUnknownRequest("Amount cannot be less than 1")
 	}
 	return nil
