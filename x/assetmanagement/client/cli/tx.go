@@ -144,8 +144,8 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	}
 
 	setupBoolFlag(cmd, "mintable", "m", false, "is the new token mintable", false)
-	setupStringFlag(cmd, "token-name", "tn", "", "the name of the new token", true)
-	setupInt64Flag(cmd, "total-supply", "ts", -1,
+	setupStringFlag(cmd, "token-name", "n", "", "the name of the new token", true)
+	setupInt64Flag(cmd, "total-supply", "t", -1,
 		"what is the total supply for the new token", true)
 	setupStringFlag(cmd, "symbol", "s", "",
 		"what is the shorthand symbol, eg ABC, for the new token", true)
