@@ -36,8 +36,20 @@ var (
 	// DefaultNodeHome sets the folder where the application data and configuration will be stored
 	DefaultNodeHome = os.ExpandEnv("$HOME/.famd")
 
-	// ModuleBasicManager is in charge of setting up basic module elements
-	ModuleBasics = module.NewBasicManager()
+	// NewBasicManager is in charge of setting up basic module elements
+	ModuleBasics = module.NewBasicManager(
+		genaccounts.AppModuleBasic{},
+		genutil.AppModuleBasic{},
+		auth.AppModuleBasic{},
+		bank.AppModuleBasic{},
+		staking.AppModuleBasic{},
+		distr.AppModuleBasic{},
+		params.AppModuleBasic{},
+		slashing.AppModuleBasic{},
+		supply.AppModuleBasic{},
+
+		assetmanagement.AppModule{},
+	)
 
 	// account permissions
 	maccPerms = map[string][]string{
