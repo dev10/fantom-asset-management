@@ -143,11 +143,11 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	setupBoolFlag(cmd, "mintable", "m", false, "is the new token mintable", false)
-	setupStringFlag(cmd, "token-name", "n", "", "the name of the new token", true)
-	setupInt64Flag(cmd, "total-supply", "t", -1,
+	setupBoolFlag(cmd, "mintable", "", false, "is the new token mintable", false)
+	setupStringFlag(cmd, "token-name", "", "", "the name of the new token", true)
+	setupInt64Flag(cmd, "total-supply", "", -1,
 		"what is the total supply for the new token", true)
-	setupStringFlag(cmd, "symbol", "s", "",
+	setupStringFlag(cmd, "symbol", "", "",
 		"what is the shorthand symbol, eg ABC, for the new token", true)
 
 	return cmd
@@ -181,9 +181,9 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	setupInt64Flag(cmd, "amount", "a", -1,
+	setupInt64Flag(cmd, "amount", "", -1,
 		"what is the total amount of coins to mint for the given token", true)
-	setupStringFlag(cmd, "symbol", "s", "",
+	setupStringFlag(cmd, "symbol", "", "",
 		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
 
 	return cmd
@@ -224,9 +224,9 @@ func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	setupInt64Flag(cmd, "amount", "a", -1,
+	setupInt64Flag(cmd, "amount", "", -1,
 		"what is the total amount of coins to burn for the given token", true)
-	setupStringFlag(cmd, "symbol", "s", "",
+	setupStringFlag(cmd, "symbol", "", "",
 		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
 
 	return cmd
@@ -256,9 +256,9 @@ func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	setupInt64Flag(cmd, "amount", "a", -1,
+	setupInt64Flag(cmd, "amount", "", -1,
 		"what is the total amount of coins to freeze for the given token", true)
-	setupStringFlag(cmd, "symbol", "s", "",
+	setupStringFlag(cmd, "symbol", "", "",
 		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
 
 	return cmd
@@ -288,9 +288,9 @@ func GetCmdUnfreezeCoins(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	setupInt64Flag(cmd, "amount", "a", -1,
+	setupInt64Flag(cmd, "amount", "", -1,
 		"what is the total amount of coins to unfreeze for the given token", true)
-	setupStringFlag(cmd, "symbol", "s", "",
+	setupStringFlag(cmd, "symbol", "", "",
 		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
 
 	return cmd
