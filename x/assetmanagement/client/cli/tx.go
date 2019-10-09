@@ -14,10 +14,6 @@ import (
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 )
 
-var (
-	_from string
-)
-
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	txRootCmd := &cobra.Command{
 		Use:                        "token",
@@ -25,11 +21,6 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		DisableFlagParsing:         false,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
-	}
-	txRootCmd.PersistentFlags().StringVarP(&_from, "from", "f", "", "the account")
-	err := txRootCmd.MarkPersistentFlagRequired("from")
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup 'from' flag: %s", err))
 	}
 
 	txRootCmd.AddCommand(client.PostCommands(
@@ -102,11 +93,11 @@ func setupInt64Flag(cmd *cobra.Command, name string, shorthand string, value int
 	}
 }
 
-func getAccountAddress(bech32 string) sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(bech32)
-	if err != nil {
-		panic(fmt.Sprintf("failed to get account address from '%s': %v", bech32, err))
-	}
+func getAccountAddress(cliCtx client.CLIContext) sdk.AccAddress {
+	from := cliCtx.GetFromName()
+	address := cliCtx.GetFromAddress()
+	fmt.Printf("token account: %s / %v", from, address)
+
 	return address
 }
 
@@ -122,10 +113,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			// find given account
-			from := fetchStringFlag(cmd, "from")
-			address := getAccountAddress(from)
-			fmt.Printf("token account: %s / %v", from, address)
+			address := getAccountAddress(cliCtx)
 
 			name := fetchStringFlag(cmd, "token-name")
 			symbol := fetchStringFlag(cmd, "symbol")
@@ -156,7 +144,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 // GetCmdMintCoins is the CLI command for sending a MintCoins transaction
 func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `mint --amount [amount] --symbol [ABC-123] --from [account]`,
+		Use:   `mint --amount [amount] --symbol [ABC-123]`,
 		Short: "mint more coins for the specified token",
 		// Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -168,7 +156,7 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 			// 	return err
 			// }
 
-			address, symbol, amount := getCommonParameters(cmd)
+			address, symbol, amount := getCommonParameters(cliCtx, cmd)
 
 			msg := types.NewMsgMintCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
@@ -189,12 +177,9 @@ func GetCmdMintCoins(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func getCommonParameters(cmd *cobra.Command) (sdk.AccAddress, string, int64) {
+func getCommonParameters(cliCtx client.CLIContext, cmd *cobra.Command) (sdk.AccAddress, string, int64) {
 	// find given account
-	from := fetchStringFlag(cmd, "from")
-	address := getAccountAddress(from)
-	fmt.Printf("token account: %s / %v", from, address)
-
+	address := getAccountAddress(cliCtx)
 	symbol := fetchStringFlag(cmd, "symbol")
 	amount := fetchInt64Flag(cmd, "amount")
 	return address, symbol, amount
@@ -211,7 +196,7 @@ func GetCmdBurnCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			address, symbol, amount := getCommonParameters(cmd)
+			address, symbol, amount := getCommonParameters(cliCtx, cmd)
 
 			msg := types.NewMsgBurnCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
@@ -243,7 +228,7 @@ func GetCmdFreezeCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			address, symbol, amount := getCommonParameters(cmd)
+			address, symbol, amount := getCommonParameters(cliCtx, cmd)
 
 			msg := types.NewMsgFreezeCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
@@ -275,7 +260,7 @@ func GetCmdUnfreezeCoins(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			address, symbol, amount := getCommonParameters(cmd)
+			address, symbol, amount := getCommonParameters(cliCtx, cmd)
 
 			msg := types.NewMsgUnfreezeCoins(amount, symbol, address)
 			err := msg.ValidateBasic()
