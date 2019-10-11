@@ -104,3 +104,32 @@ Example on **testnet:**
 ```bash
 ./tfamcli token unfreeze --amount 2000000 --symbol NNF-F77 --from alice --chain-id Fantom-Chain-Omega --node https://data.testnet.io:443 --trust-node
 ```
+
+
+## Querying the Chain
+
+To find more information on transactions or blocks, eg after issuing a new token, you can do any of the following 
+
+### Query transaction example
+
+***command line:***
+ ```bash
+famcli query txs --tags 'tx.hash:DA6DFD4662B340B42EC42AE167E54FD7108CBB90E69506F663112395D7BEF6F0' --page 1 --limit 10
+```
+
+***REST server:***
+
+```http request
+https://127.0.0.1:1317/txs?tx.hash=DA6DFD4662B340B42EC42AE167E54FD7108CBB90E69506F663112395D7BEF6F0&page=1&limit=10
+```
+
+### Query block example (command line):
+ ```bash
+famcli query txs --tags 'tx.height:1081' --page 1 --limit 10
+```
+
+***REST server:***
+
+```http request
+https://127.0.0.1:1317/txs?tx.height=1081&page=1&limit=10
+```
