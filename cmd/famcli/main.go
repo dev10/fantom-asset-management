@@ -14,8 +14,19 @@ import (
 	app "github.com/dev10/fantom-asset-management"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	amino "github.com/tendermint/go-amino"
+	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/cli"
+	tmflags "github.com/tendermint/tendermint/libs/cli/flags"
+	"github.com/tendermint/tendermint/libs/log"
+)
+
+const (
+	defaultLogLevel = "error"
+	FlagLogLevel    = "log_level"
+)
+
+var (
+	logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "main")
 )
 
 func main() {
@@ -37,7 +48,16 @@ func main() {
 
 	// Add --chain-id to persistent flags and mark it required
 	rootCmd.PersistentFlags().String(client.FlagChainID, "", "Chain ID of tendermint node")
-	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
+	rootCmd.PersistentFlags().String(FlagLogLevel, defaultLogLevel, "Log level")
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) (err error) {
+		level := viper.GetString(FlagLogLevel)
+		logger, err = tmflags.ParseLogLevel(level, logger, defaultLogLevel)
+		if err != nil {
+			return err
+		}
+		if viper.GetBool(cli.TraceFlag) {
+			logger = log.NewTracingLogger(logger)
+		}
 		return initConfig(rootCmd)
 	}
 

@@ -25,5 +25,5 @@ func randomString(length int) string {
 }
 
 func GenerateNewSymbol(original string) string {
-	return fmt.Sprintf("%s-%s", original, randomString(3))
+	return fmt.Sprintf("%s%s", original, randomString(3))
 }
