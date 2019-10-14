@@ -74,7 +74,7 @@ func main() {
 		client.LineBreak,
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "NS", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "FAM", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
