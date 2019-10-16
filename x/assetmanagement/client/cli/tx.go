@@ -1,15 +1,23 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/input"
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 )
@@ -110,6 +118,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 		// Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx.BroadcastMode = flags.BroadcastBlock // wait in order to query later
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
@@ -119,7 +128,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			symbol := fetchStringFlag(cmd, "symbol")
 			totalSupply := fetchInt64Flag(cmd, "total-supply")
 			mintable := fetchBoolFlag(cmd, "mintable")
-			fmt.Printf("token is mintable? %t\n", mintable)
+			log.Debugf("token is mintable? %t", mintable)
 
 			msg := types.NewMsgIssueToken(address, name, symbol, totalSupply, mintable)
 			err := msg.ValidateBasic()
@@ -127,7 +136,11 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			response, result := GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+
+			printIssuedSymbol(response, cliCtx)
+
+			return result
 		},
 	}
 
@@ -139,6 +152,33 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 		"what is the shorthand symbol, eg ABC, for the new token", true)
 
 	return cmd
+}
+
+func printIssuedSymbol(response *sdk.TxResponse, cliCtx context.CLIContext) {
+	if response != nil {
+		txHash := response.TxHash
+		tmTags := []string{fmt.Sprintf("tx.hash='%s'", txHash)}
+
+		txs, err := utils.QueryTxsByEvents(cliCtx, tmTags, 1, 1)
+		if err != nil {
+			log.Errorf("Failed to find new transaction for hash: %s because: %s", txHash, err)
+		} else if txs != nil {
+			if txs.Count == 0 || len(txs.Txs[0].Logs) == 0 {
+				log.Errorf("Failed to find new transaction for hash: %s", txHash)
+			} else {
+				log.Debugf("Found new transaction: %s", txs.Txs)
+				logResponse := txs.Txs[0].Logs[0]
+				if logResponse.Success == false {
+					log.Errorf("Transaction failed: %s", logResponse)
+				} else {
+					newSymbol := logResponse.Log
+					log.Infof("Symbol issued: %s", newSymbol)
+				}
+			}
+		}
+	} else {
+		log.Errorf("No response")
+	}
 }
 
 // GetCmdMintCoins is the CLI command for sending a MintCoins transaction
@@ -279,4 +319,90 @@ func GetCmdUnfreezeCoins(cdc *codec.Codec) *cobra.Command {
 		"what is the shorthand symbol, eg ABC-123, for the existing token", true)
 
 	return cmd
+}
+
+// GenerateOrBroadcastMsgs creates a StdTx given a series of messages. If
+// the provided context has generate-only enabled, the tx will only be printed
+// to STDOUT in a fully offline manner. Otherwise, the tx will be signed and
+// broadcast.
+func GenerateOrBroadcastMsgs(cliCtx context.CLIContext, txBldr authtypes.TxBuilder, msgs []sdk.Msg) (*sdk.TxResponse, error) {
+	if cliCtx.GenerateOnly {
+		return nil, utils.PrintUnsignedStdTx(txBldr, cliCtx, msgs)
+	}
+
+	return CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+}
+
+// CompleteAndBroadcastTxCLI implements a utility function that facilitates
+// sending a series of messages in a signed transaction given a TxBuilder and a
+// QueryContext. It ensures that the account exists, has a proper number and
+// sequence set. In addition, it builds and signs a transaction with the
+// supplied messages. Finally, it broadcasts the signed transaction to a node
+// and returns the response and/or error
+func CompleteAndBroadcastTxCLI(txBldr authtypes.TxBuilder, cliCtx context.CLIContext, msgs []sdk.Msg) (*sdk.TxResponse, error) {
+	txBldr, err := utils.PrepareTxBuilder(txBldr, cliCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	fromName := cliCtx.GetFromName()
+
+	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
+		txBldr, err = utils.EnrichWithGas(txBldr, cliCtx, msgs)
+		if err != nil {
+			return nil, err
+		}
+
+		gasEst := utils.GasEstimateResponse{GasEstimate: txBldr.Gas()}
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", gasEst.String())
+	}
+
+	if cliCtx.Simulate {
+		return nil, nil
+	}
+
+	if !cliCtx.SkipConfirm {
+		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+		if err != nil {
+			return nil, err
+		}
+
+		var json []byte
+		if viper.GetBool(flags.FlagIndentResponse) {
+			json, err = cliCtx.Codec.MarshalJSONIndent(stdSignMsg, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			json = cliCtx.Codec.MustMarshalJSON(stdSignMsg)
+		}
+
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", json)
+
+		buf := bufio.NewReader(os.Stdin)
+		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf)
+		if err != nil || !ok {
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+			return nil, err
+		}
+	}
+
+	passphrase, err := keys.GetPassphrase(fromName)
+	if err != nil {
+		return nil, err
+	}
+
+	// build and sign the transaction
+	txBytes, err := txBldr.BuildAndSign(fromName, passphrase, msgs)
+	if err != nil {
+		return nil, err
+	}
+
+	// broadcast to a Tendermint node
+	res, err := cliCtx.BroadcastTx(txBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, cliCtx.PrintOutput(res)
 }

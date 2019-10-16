@@ -53,11 +53,11 @@ func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg MsgIssueToken) sdk.
 		return sdk.ErrInternal(fmt.Sprintf("failed to store new token: '%s'", err)).Result()
 	}
 
-	newSymbolLog := fmt.Sprintf("new symbol: %s", newRandomSymbol)
+	newSymbolLog := fmt.Sprintf("new_symbol=%s", newRandomSymbol)
 	ctx.Logger().Info(newSymbolLog)
 	return sdk.Result{
 		Log: newSymbolLog,
-	} // Todo: return new symbol name?
+	}
 }
 
 // handle message to mint coins

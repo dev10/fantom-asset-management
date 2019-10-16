@@ -41,7 +41,7 @@ require (
 	github.com/otiai10/curr v0.0.0-20150429015615-9b4961190c95 // indirect
 	github.com/otiai10/mint v1.2.3 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
-	github.com/prometheus/common v0.6.0 // indirect
+	github.com/prometheus/common v0.6.0
 	github.com/prometheus/procfs v0.0.3 // indirect
 	github.com/rogpeppe/fastuuid v1.2.0 // indirect
 	github.com/russross/blackfriday v2.0.0+incompatible // indirect
