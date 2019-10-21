@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/keeper"
 
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
@@ -16,7 +17,7 @@ func findTokenHandler(cliCtx context.CLIContext, storeName string) http.HandlerF
 		vars := mux.Vars(r)
 		paramType := vars[restName]
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/find/%s", storeName, paramType), nil)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", storeName, keeper.QueryToken, paramType), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -28,7 +29,7 @@ func findTokenHandler(cliCtx context.CLIContext, storeName string) http.HandlerF
 
 func symbolsHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/symbols", storeName), nil)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", storeName, keeper.QuerySymbols), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

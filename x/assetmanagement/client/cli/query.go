@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/keeper"
 	"github.com/dev10/fantom-asset-management/x/assetmanagement/internal/types"
 	"github.com/spf13/cobra"
 )
@@ -35,9 +36,9 @@ func GetCmdFindToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			symbol := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/find/%s", queryRoute, symbol), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", queryRoute, keeper.QueryToken, symbol), nil)
 			if err != nil {
-				fmt.Printf("could not find symbol - '%s'\n", symbol)
+				fmt.Printf("could not find symbol - '%s'. reason: '%s'\n", symbol, err)
 				return nil
 			}
 
@@ -57,9 +58,9 @@ func GetCmdSymbols(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/symbols", queryRoute), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, keeper.QuerySymbols), nil)
 			if err != nil {
-				fmt.Printf("could not get query symbols\n")
+				fmt.Printf("could not get query symbols. reason: '%s'\n", err)
 				return nil
 			}
 
