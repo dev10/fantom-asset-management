@@ -30,8 +30,16 @@ FROM alpine AS fam
 COPY --from=fam_builder /go/bin/famd /bin/famd
 COPY --from=fam_builder /go/bin/famcli /bin/famcli
 
+# Setup entrypoint script
+RUN apk add --no-cache bash
+COPY docker-entrypoint.sh /bin/
+RUN chmod +x /bin/docker-entrypoint.sh
+RUN ln -s /bin/docker-entrypoint.sh / # backwards compat
+
 # Expose port(s) to the outside world
 EXPOSE 26656
 
 # Command to run the executable
-CMD ["/bin/famd", "start", "--trace"]
+#CMD ["/bin/famd", "start", "--trace"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["famd", "start", "--trace"]
