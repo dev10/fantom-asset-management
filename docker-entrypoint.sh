@@ -38,6 +38,8 @@ if [ "$1" = 'full_init' ]; then
 
   famd start --trace
 elif [ "$1" = 'init' ]; then
+  # get minified genesis: jq -c . < ~/.famd/config/genesis.json > genesis_min.json
+  # example: docker run --rm fam-1.0.0 init mon2 a5d256ab4e1621861d7eda1dfd892be9b4efb3da@127.0.0.1:26656 $(cat genesis_min.json)
   MONIKER=node-"$2"
   FIRST_NODE_ID="$3"
   GENESIS="$4"
@@ -53,6 +55,8 @@ elif [ "$1" = 'init' ]; then
 
   echo "genesis.json:"
   cat /root/.famd/config/genesis.json
+
+  echo "validating genesis..."
   famd validate-genesis
 
   famd start --trace
