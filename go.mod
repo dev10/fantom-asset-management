@@ -67,3 +67,9 @@ require (
 	mvdan.cc/unparam v0.0.0-20190720180237-d51796306d8f // indirect
 	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
 )
+
+		replace github.com/mgechev/dots v0.0.0-20190603122614-18fa4c4b71cc => github.com/mgechev/dots v0.0.0-20181228164730-18fa4c4b71cc
+
+		replace golang.org/x/sys v0.0.0-20190804054238-51ab0e2deafa => golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa
+
+		replace golang.org/x/tools v0.0.0-20190806195817-6743d4095d4b => golang.org/x/tools v0.0.0-20190806194950-6743d4095d4b
