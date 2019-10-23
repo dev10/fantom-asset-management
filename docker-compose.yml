@@ -1,0 +1,120 @@
+version: '3'
+
+services:
+  app-1:
+    image: "fam:latest"
+    ports:
+      - 127.0.0.1:26657:26656
+    #command: "full_init"
+    command: "famd start --trace"
+    restart: unless-stopped
+    volumes:
+      - famd_data_1:/root
+
+  app-2:
+    image: "fam:latest"
+    ports:
+      - 127.0.0.1:26658:26656
+    links:
+      - app-1:app-1
+    depends_on:
+      - app-1
+    command: "famd start --trace"
+    restart: unless-stopped
+    volumes:
+      - famd_data_2:/root
+
+  app-3:
+    image: "fam:latest"
+    ports:
+      - 127.0.0.1:26659:26656
+    links:
+      - app-1:app-1
+    depends_on:
+      - app-1
+    command: "famd start --trace"
+    restart: unless-stopped
+    volumes:
+      - famd_data_3:/root
+
+  app-4:
+    image: "fam:latest"
+    ports:
+      - 127.0.0.1:26660:26656
+    links:
+      - app-1:app-1
+    depends_on:
+      - app-1
+    command: "famd start --trace"
+    restart: unless-stopped
+    volumes:
+      - famd_data_4:/root
+
+  app-5:
+    image: "fam:latest"
+    ports:
+      - 127.0.0.1:26661:26656
+    links:
+      - app-1:app-1
+    depends_on:
+      - app-1
+    command: "famd start --trace"
+    restart: unless-stopped
+    volumes:
+      - famd_data_5:/root
+
+  app-6:
+    image: "fam:latest"
+    ports:
+      - 127.0.0.1:26659:26656
+    links:
+      - app-1:app-1
+    depends_on:
+      - app-1
+    command: "famd start --trace"
+    restart: unless-stopped
+    volumes:
+      - famd_data_6:/root
+
+volumes:
+  famd_data_1:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${APP_DATA_PATH}-1
+
+  famd_data_2:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${APP_DATA_PATH}-2
+
+  famd_data_3:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${APP_DATA_PATH}-3
+
+  famd_data_4:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${APP_DATA_PATH}-4
+
+  famd_data_5:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${APP_DATA_PATH}-5
+
+  famd_data_6:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${APP_DATA_PATH}-6

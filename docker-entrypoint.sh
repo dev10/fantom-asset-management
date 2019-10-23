@@ -35,11 +35,12 @@ if [ "$1" = 'full_init' ]; then
 
   echo "genesis.json:"
   cat /root/.famd/config/genesis.json
-
-  famd start --trace
 elif [ "$1" = 'init' ]; then
   # get minified genesis: jq -c . < ~/.famd/config/genesis.json > genesis_min.json
-  # example: docker run --rm fam-1.0.0 init mon2 a5d256ab4e1621861d7eda1dfd892be9b4efb3da@127.0.0.1:26656 $(cat genesis_min.json)
+  # examples:
+  # docker run --rm fam init mon2 33c93e57636bbabad14c9803cffe1ce452ade3d5@127.0.0.1:26656 $(cat genesis_min.json)
+  # docker-compose run --no-deps app-2 init mon2 d0afa724f130f4d55164e798ef0b6c87591f1ea0@172.18.0.2:26656 "$(jq -c . < ./app1/.famd/config/genesis.json)"
+  # docker-compose run --no-deps app-3 init mon3 d0afa724f130f4d55164e798ef0b6c87591f1ea0@172.18.0.2:26656 "$(cat ./app1/.famd/config/genesis.json)"
   MONIKER=node-"$2"
   FIRST_NODE_ID="$3"
   GENESIS="$4"
@@ -49,6 +50,7 @@ elif [ "$1" = 'init' ]; then
 
   # in ~/.famd/config/config.toml update persistent_peers = "first_id@first_node_ip:26656""
   sed -i "s/persistent_peers =.*/persistent_peers = \"${FIRST_NODE_ID}\"/g" /root/.famd/config/config.toml
+  sed -i "s/addr_book_strict =.*/addr_book_strict = \"false\"/g" /root/.famd/config/config.toml
 
   # overwrite with first nodes ~/.famd/config/genesis.json
   echo "${GENESIS}" > /root/.famd/config/genesis.json
@@ -58,8 +60,6 @@ elif [ "$1" = 'init' ]; then
 
   echo "validating genesis..."
   famd validate-genesis
-
-  famd start --trace
 else
   echo "starting cmd...: " "$@"
   exec "$@"
