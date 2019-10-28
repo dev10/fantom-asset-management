@@ -1,4 +1,18 @@
-version: '3'
+version: '3.4'
+
+# extra nodes
+x-node: &node
+  image: "fam:latest"
+  ports:
+    - 127.0.0.1:26658:26656
+  links:
+    - app-1:app-1
+  depends_on:
+    - app-1
+  command: "famd start --trace"
+  restart: unless-stopped
+  volumes:
+    - famd_data_2:/root
 
 services:
   app-1:
@@ -12,67 +26,37 @@ services:
       - famd_data_1:/root
 
   app-2:
-    image: "fam:latest"
+    <<: *node
     ports:
       - 127.0.0.1:26658:26656
-    links:
-      - app-1:app-1
-    depends_on:
-      - app-1
-    command: "famd start --trace"
-    restart: unless-stopped
     volumes:
       - famd_data_2:/root
 
   app-3:
-    image: "fam:latest"
+    <<: *node
     ports:
       - 127.0.0.1:26659:26656
-    links:
-      - app-1:app-1
-    depends_on:
-      - app-1
-    command: "famd start --trace"
-    restart: unless-stopped
     volumes:
       - famd_data_3:/root
 
   app-4:
-    image: "fam:latest"
+    <<: *node
     ports:
       - 127.0.0.1:26660:26656
-    links:
-      - app-1:app-1
-    depends_on:
-      - app-1
-    command: "famd start --trace"
-    restart: unless-stopped
     volumes:
       - famd_data_4:/root
 
   app-5:
-    image: "fam:latest"
+    <<: *node
     ports:
       - 127.0.0.1:26661:26656
-    links:
-      - app-1:app-1
-    depends_on:
-      - app-1
-    command: "famd start --trace"
-    restart: unless-stopped
     volumes:
       - famd_data_5:/root
 
   app-6:
-    image: "fam:latest"
+    <<: *node
     ports:
-      - 127.0.0.1:26659:26656
-    links:
-      - app-1:app-1
-    depends_on:
-      - app-1
-    command: "famd start --trace"
-    restart: unless-stopped
+      - 127.0.0.1:26662:26656
     volumes:
       - famd_data_6:/root
 
