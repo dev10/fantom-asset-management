@@ -1,7 +1,9 @@
 package keeper
 
 import (
+	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
@@ -31,9 +33,15 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
+func unprettifySymbol(symbol string) string {
+	clean := strings.Replace(symbol, "-", "", -1)
+	return strings.ToLower(clean)
+}
+
 // nolint: unparam
 func queryToken(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	token, err := keeper.GetToken(ctx, path[0])
+	searchToken := unprettifySymbol(path[0])
+	token, err := keeper.GetToken(ctx, searchToken)
 	if err != nil {
 		panic(fmt.Sprintf("could not get token: %s", err))
 	}
@@ -46,6 +54,25 @@ func queryToken(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	return res, nil
 }
 
+func insertInto(s string, interval int, sep rune) string {
+	var buffer bytes.Buffer
+	before := interval - 1
+	last := len(s) - 1
+	for i, char := range s {
+		buffer.WriteRune(char)
+		if i%interval == before && i != last {
+			buffer.WriteRune(sep)
+		}
+	}
+	return buffer.String()
+}
+
+func prettifySymbol(symbol string) string {
+	clean := strings.Replace(symbol, "-", "", -1)
+	upper := strings.ToUpper(clean)
+	return insertInto(upper, 3, '-')
+}
+
 // nolint: unparam
 func querySymbols(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var symbolList types.QueryResultSymbol
@@ -53,7 +80,7 @@ func querySymbols(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	iterator := keeper.GetTokensIterator(ctx)
 
 	for ; iterator.Valid(); iterator.Next() {
-		symbolList = append(symbolList, string(iterator.Key()))
+		symbolList = append(symbolList, prettifySymbol(string(iterator.Key())))
 	}
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, symbolList)
