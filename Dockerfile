@@ -31,7 +31,7 @@ COPY --from=fam_builder /go/bin/famd /bin/famd
 COPY --from=fam_builder /go/bin/famcli /bin/famcli
 
 # Setup entrypoint script
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash curl
 COPY docker-entrypoint.sh /bin/
 RUN chmod +x /bin/docker-entrypoint.sh
 RUN ln -s /bin/docker-entrypoint.sh / # backwards compat

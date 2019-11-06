@@ -169,7 +169,7 @@ func printIssuedSymbol(response *sdk.TxResponse, cliCtx context.CLIContext) {
 				log.Debugf("Found new transaction: %s", txs.Txs)
 				logResponse := txs.Txs[0].Logs[0]
 				if logResponse.Success == false {
-					log.Errorf("Transaction failed: %s", logResponse)
+					log.Errorf("Transaction failed: %v", logResponse)
 				} else {
 					newSymbol := logResponse.Log
 					log.Infof("Symbol issued: %s", newSymbol)
