@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dev10/fantom-asset-management/x/assetmanagement/rand"
 )
 
 // NewHandler returns a handler for "assetmanagement" type messages.
@@ -39,21 +38,21 @@ func handleMsgIssueToken(ctx sdk.Context, keeper Keeper, msg MsgIssueToken) sdk.
 	}()
 
 	// must be lowercase otherwise NewToken will panic
-	var newRandomSymbol = strings.ToLower(rand.GenerateNewSymbol(msg.Symbol))
+	var newSymbol = strings.ToLower(msg.Symbol)
 
-	token := NewToken(msg.Name, newRandomSymbol, msg.Symbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
+	token := NewToken(msg.Name, newSymbol, msg.OriginalSymbol, msg.TotalSupply, msg.SourceAddress, msg.Mintable)
 
 	keeperErr := keeper.CoinKeeper.SetCoins(ctx, msg.SourceAddress, token.TotalSupply)
 	if keeperErr != nil {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("failed to store new token in bank: %s", keeperErr)).Result()
 	}
 
-	err := keeper.SetToken(ctx, newRandomSymbol, token)
+	err := keeper.SetToken(ctx, newSymbol, token)
 	if err != nil {
 		return sdk.ErrInternal(fmt.Sprintf("failed to store new token: '%s'", err)).Result()
 	}
 
-	newSymbolLog := fmt.Sprintf("new_symbol=%s", newRandomSymbol)
+	newSymbolLog := fmt.Sprintf("new_symbol=%s", newSymbol)
 	ctx.Logger().Info(newSymbolLog)
 	return sdk.Result{
 		Log: newSymbolLog,

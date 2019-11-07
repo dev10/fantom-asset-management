@@ -8,22 +8,24 @@ const RouterKey = ModuleName // this was defined in your key.go file
 
 // MsgIssueToken defines a IssueToken message
 type MsgIssueToken struct {
-	SourceAddress sdk.AccAddress `json:"source_address"`
-	Name          string         `json:"name"`
-	Symbol        string         `json:"symbol"`
-	TotalSupply   int64          `json:"total_supply"`
-	Mintable      bool           `json:"mintable"`
+	SourceAddress  sdk.AccAddress `json:"source_address"`
+	Name           string         `json:"name"`
+	Symbol         string         `json:"symbol"`
+	OriginalSymbol string         `json:"original_symbol"`
+	TotalSupply    int64          `json:"total_supply"`
+	Mintable       bool           `json:"mintable"`
 }
 
 // NewMsgIssueToken is a constructor function for MsgIssueToken
-func NewMsgIssueToken(sourceAddress sdk.AccAddress, name, symbol string,
+func NewMsgIssueToken(sourceAddress sdk.AccAddress, name, symbol string, originalSymbol string,
 	totalSupply int64, mintable bool) MsgIssueToken {
 	return MsgIssueToken{
-		SourceAddress: sourceAddress,
-		Name:          name,
-		Symbol:        symbol,
-		TotalSupply:   totalSupply,
-		Mintable:      mintable,
+		SourceAddress:  sourceAddress,
+		Name:           name,
+		Symbol:         symbol,
+		OriginalSymbol: originalSymbol,
+		TotalSupply:    totalSupply,
+		Mintable:       mintable,
 	}
 }
 
@@ -38,8 +40,8 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	if msg.SourceAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.SourceAddress.String())
 	}
-	if len(msg.Name) == 0 || len(msg.Symbol) == 0 {
-		return sdk.ErrUnknownRequest("Name and/or Symbol cannot be empty")
+	if len(msg.Name) == 0 || len(msg.Symbol) == 0 || len(msg.OriginalSymbol) == 0 {
+		return sdk.ErrUnknownRequest("Name and/or Symbols cannot be empty")
 	}
 	if msg.TotalSupply < 1 {
 		return sdk.ErrUnknownRequest("TotalSupply cannot be less than 1")

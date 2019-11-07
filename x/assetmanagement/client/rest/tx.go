@@ -2,8 +2,10 @@ package rest
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/rand"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -41,8 +43,10 @@ func issueTokenHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		symbol := strings.ToLower(rand.GenerateNewSymbol(req.Symbol))
+
 		// create the message
-		msg := types.NewMsgIssueToken(addr, req.Name, req.Symbol, req.TotalSupply, req.Mintable)
+		msg := types.NewMsgIssueToken(addr, req.Name, symbol, req.Symbol, req.TotalSupply, req.Mintable)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

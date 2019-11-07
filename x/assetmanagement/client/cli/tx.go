@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -15,6 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/rand"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -125,12 +127,13 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			address := getAccountAddress(cliCtx)
 
 			name := fetchStringFlag(cmd, "token-name")
-			symbol := fetchStringFlag(cmd, "symbol")
+			originalSymbol := fetchStringFlag(cmd, "symbol")
+			symbol := strings.ToLower(rand.GenerateNewSymbol(originalSymbol))
 			totalSupply := fetchInt64Flag(cmd, "total-supply")
 			mintable := fetchBoolFlag(cmd, "mintable")
 			log.Debugf("token is mintable? %t", mintable)
 
-			msg := types.NewMsgIssueToken(address, name, symbol, totalSupply, mintable)
+			msg := types.NewMsgIssueToken(address, name, symbol, originalSymbol, totalSupply, mintable)
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err

@@ -2,9 +2,11 @@ package types
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/dev10/fantom-asset-management/x/assetmanagement/rand"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,9 +19,9 @@ func validateError(cases []struct {
 	for i, tc := range cases {
 		err := tc.tx.ValidateBasic()
 		if tc.valid {
-			require.Nil(t, err, fmt.Sprintf("transaction [no: %d] [%v] failed but was marked valid", i, tc))
+			require.Nil(t, err, fmt.Sprintf("transaction [no: %d] [%v] failed but was supposed to be valid", i, tc.tx))
 		} else {
-			require.NotNil(t, err, fmt.Sprintf("transaction [no: %d] [%v] is valid but has an error", i, tc))
+			require.NotNil(t, err, fmt.Sprintf("transaction [no: %d] [%v] is valid but is supposed to have an error", i, tc.tx))
 		}
 	}
 }
@@ -28,11 +30,12 @@ func validateError(cases []struct {
 
 func TestMsgIssueToken(t *testing.T) {
 	var (
-		name         = "Zap"
-		symbol       = "ZAP"
-		total  int64 = 1
-		owner        = sdk.AccAddress([]byte("me"))
-		msg          = NewMsgIssueToken(owner, name, symbol, total, false)
+		name                 = "Zap"
+		originalSymbol       = "ZAP"
+		symbol               = strings.ToLower(rand.GenerateNewSymbol(originalSymbol))
+		total          int64 = 1
+		owner                = sdk.AccAddress([]byte("me"))
+		msg                  = NewMsgIssueToken(owner, name, symbol, originalSymbol, total, false)
 	)
 
 	require.Equal(t, msg.Route(), RouterKey)
@@ -41,29 +44,30 @@ func TestMsgIssueToken(t *testing.T) {
 
 func TestMsgIssueTokenValidation(t *testing.T) {
 	var (
-		name               = "Zap"
-		symbol             = "ZAP"
-		total        int64 = 1
-		totalInvalid int64 = 0
-		acc                = sdk.AccAddress([]byte("me"))
-		name2              = "a"
-		total2       int64 = 2
-		acc2               = sdk.AccAddress([]byte("you"))
+		name                 = "Zap"
+		originalSymbol       = "ZAP"
+		symbol               = strings.ToLower(rand.GenerateNewSymbol(originalSymbol))
+		total          int64 = 1
+		totalInvalid   int64 = 0
+		acc                  = sdk.AccAddress([]byte("me"))
+		name2                = "a"
+		total2         int64 = 2
+		acc2                 = sdk.AccAddress([]byte("you"))
 	)
 
 	cases := []struct {
 		valid bool
 		tx    MsgInterface
 	}{
-		{true, NewMsgIssueToken(acc, name, symbol, total, false)},
-		{true, NewMsgIssueToken(acc, name, symbol, total, false)},
-		{false, NewMsgIssueToken(acc, name, symbol, totalInvalid, false)},
-		{true, NewMsgIssueToken(acc2, name2, symbol, total2, false)},
-		{true, NewMsgIssueToken(acc2, name2, symbol, total, false)},
-		{true, NewMsgIssueToken(acc, name2, symbol, total2, false)},
-		{false, NewMsgIssueToken(nil, name, symbol, total2, false)},
-		{false, NewMsgIssueToken(acc2, "", symbol, total2, false)},
-		{false, NewMsgIssueToken(acc2, name, symbol, totalInvalid, false)},
+		{true, NewMsgIssueToken(acc, name, symbol, originalSymbol, total, false)},
+		{true, NewMsgIssueToken(acc, name, symbol, originalSymbol, total, false)},
+		{false, NewMsgIssueToken(acc, name, symbol, originalSymbol, totalInvalid, false)},
+		{true, NewMsgIssueToken(acc2, name2, symbol, originalSymbol, total2, false)},
+		{true, NewMsgIssueToken(acc2, name2, symbol, originalSymbol, total, false)},
+		{true, NewMsgIssueToken(acc, name2, symbol, originalSymbol, total2, false)},
+		{false, NewMsgIssueToken(nil, name, symbol, originalSymbol, total2, false)},
+		{false, NewMsgIssueToken(acc2, "", symbol, originalSymbol, total2, false)},
+		{false, NewMsgIssueToken(acc2, name, symbol, originalSymbol, totalInvalid, false)},
 	}
 
 	validateError(cases, t)
@@ -71,11 +75,12 @@ func TestMsgIssueTokenValidation(t *testing.T) {
 
 func TestMsgIssueTokenGetSignBytes(t *testing.T) {
 	var (
-		name         = "Zap"
-		symbol       = "ZAP"
-		total  int64 = 1
-		owner        = sdk.AccAddress([]byte("me"))
-		msg          = NewMsgIssueToken(owner, name, symbol, total, false)
+		name                 = "Zap"
+		originalSymbol       = "ZAP"
+		symbol               = strings.ToLower(rand.GenerateNewSymbol(originalSymbol))
+		total          int64 = 1
+		owner                = sdk.AccAddress([]byte("me"))
+		msg                  = NewMsgIssueToken(owner, name, symbol, originalSymbol, total, false)
 	)
 	actual := msg.GetSignBytes()
 
@@ -83,8 +88,9 @@ func TestMsgIssueTokenGetSignBytes(t *testing.T) {
 		`"value":{` +
 		`"mintable":false,` +
 		`"name":"Zap",` +
+		`"original_symbol":"ZAP",` +
 		`"source_address":"cosmos1d4js690r9j",` +
-		`"symbol":"ZAP",` +
+		`"symbol":"` + symbol + `",` +
 		`"total_supply":"1"}}`
 
 	require.Equal(t, expected, string(actual))
